@@ -177,7 +177,7 @@ var express = require("express"),
 		fs.readFile(req.file.path, function (err, data) {
 			if (err) {
 				throw err; 
-				res.send("Error Upload");
+				res.send("ERROR");
 			} else {
 				console.log("renaming ...");
 				// fc.move (req.file.path, 'uploads/' + req.file.originalname, function (err) {
@@ -190,6 +190,7 @@ var express = require("express"),
 				lr.on('error', function (err) {
 		   			 // 'err' contains error object
 		   			 console.log("An error occured", err.message);
+		   			 res.send("ERROR");
 				});
 				i=1;
 				async.series([
@@ -231,13 +232,61 @@ var express = require("express"),
 						}
 					})	
 					}
-				});
-
-		
+		});	
 	})
 
 	app.post('/CnvData', upload.single('file'), function (req, res) {
-		
+		fs.readFile(req.file.path, function (err, data) {
+			if (err) {
+				throw err; 
+				res.send("ERROR");
+			} else {
+				console.log("analyzing the CNV file ...");
+				// fc.move (req.file.path, 'uploads/' + req.file.originalname, function (err) {
+				//     if (err) { throw err; }
+				//     console.log ("Moved 'foo.txt' to 'bar.txt'");
+				// });
+				//fs.renameSync( req.file.path, 'uploads/test' )
+				var objectFromCNV = [];
+				var lr = new LineByLineReader('uploads/'+  req.file.filename );
+				lr.on('error', function (err) {
+		   			 // 'err' contains error object
+		   			 console.log("An error occured", err.message);
+		   			 res.send("ERROR");
+				});
+				i=1;
+				async.series([
+					function (callback) {
+						console.log("reading ..")
+						lr.on('line', function (line) {
+						    var line2 = (line).split("\t");
+						    lr.pause();
+						    setTimeout(function () {
+							    line2.splice(7,1);
+							    line2.splice(7,1);
+							    // console.log(line2);
+							    objectFromCNV.push(line2);
+						        // ...and continue emitting lines.
+						        lr.resume();
+						    }, 0.000000000001);   
+						});
+						callback();
+					}, function (callback) {
+						console.log("finished reading ...")
+						lr.on('end', function () {
+							console.log('the object is ready and lenght  : ',objectFromCNV.length);
+							res.send(objectFromCNV);
+							// All lines are read, file is closed now.
+						});	
+						callback();	
+					}
+					], function (err) {
+						if (err) {
+							res.send("ERROR");
+						}
+					})	
+					}
+		});
 	})
 
 
