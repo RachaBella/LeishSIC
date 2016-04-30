@@ -18,10 +18,16 @@ function pageLoad() {
 	      processData: false,
 	      contentType: false,
 	      success : function (response) {
-	      	drawChromosomes(response);
+	      	if (response ==="ERROR") {
+	      		alert("Une erreur s'est produite, veuillez re Uploader votre fichier !");
+	      	}
+	      	else {
+	      		drawChromosomes(response);
+	      	}
 	      },
 	      error : function (response) {
 	      	console.log(response);
+	      	alert("Une erreur s'est produite, veuillez re Uploader votre fichier !");
 	      },
 	      complete : function(resultat, statut){
 	      	console.log(resultat);
@@ -39,6 +45,15 @@ function pageLoad() {
 			processData: false,
 			contentType: false,
 			success: function (response) {
+
+				 for (var i=0; i< response.length; i++) {
+				 	response[i][2]= parseInt(response[i][2])
+				 	response[i][3]= parseInt(response[i][3])
+				 	response[i][4]= parseInt(response[i][4])
+				 	response[i][5]= parseInt(response[i][5])
+				 	response[i][9]= parseInt(response[i][9])
+				 	response[i][10] = parseInt(response[i][10])
+				 }
 				drawCNV(response);
 			},
 			error: function (response) {
@@ -93,11 +108,11 @@ function drawChromosomes(gffData) {
 	var svg = d3.select("div#svg")
             .append("svg")
             .attr("width", 3000)
-            .attr("height", 3000);
+            .attr("height", 3500);
 
     //Drawing the lines :
     var ch = [];
-    ch.length = 36;
+    ch.length = chr;
     svg.selectAll("line")
     	.data(ch)
     	.enter()
@@ -174,44 +189,7 @@ function drawChromosomes(gffData) {
     //Description of the circles : 
     y1=0;
     lmjfBefore = gffData[0][0][gffData[0][0].length-2] + gffData[0][0][gffData[0][0].length-1];
-    // svg.selectAll("text")
-    // 	.data(gffData)
-    // 	.enter()
-    // 	.append("text")
-    // 	.text( function (d,i ) {
-    // 		var data=""
-    // 		// for(i = 0; i< 21; i++) {
-    // 		// 	data = data + d[4][i]
-    // 		// }
-    // 		// console.log("el data ", data)
-    // 		// debugger;
-    // 		console.log("the data 1 : ", d[4])
-    // 		debugger;
-    // 		return d[4];
-    // 	})
-    // 	.attr("id", function (d, i) {
-    // 		return "cD" + i;
-    // 	})
-    // 	.attr("x", function (data, i) {
-    // 		lmjfCurrent = data[0][data[0].length -2] + data[0][data[0].length -1];
-    // 		$("#cD"+i).hide();
-    // 		return (60 + data[2]/1000);
-    // 	})
-    // 	.attr("y" ,function (data, i) {
-    // 		lmjfCurrent = data[0][data[0].length -2] + data[0][data[0].length -1];
-    // 		if (lmjfCurrent === lmjfBefore) {
-    // 			lmjfBefore = lmjfCurrent;
-    // 			return y1 * (3000/chr) + 10
-    // 		} else {
-    // 			lmjfBefore = lmjfCurrent;
-    // 			// console.log("they are not equal anymore !!")
-    // 			y1++;
-    // 			return y1 * (3000/chr) + 10;
-    // 		}
-    // 	})
-    // 	.attr("font-family", "century")
-   	// 	.attr("font-size", "5px")
-    	
+    
     	 $('svg circle').tipsy({ 
 	        gravity: 'w', 
 	        html: true, 
@@ -227,6 +205,214 @@ function drawChromosomes(gffData) {
 }
 
 //Drawing CNVs function
-function CNV(CnvData) {
+function drawCNV(CnvData) {
+    CnvData.splice(0,1);
+    var l = CnvData.length;
+    var current;
+    console.log(l);
+	var chr=1;
+	var chromosome = CnvData[0][1];
+	for (var i=0; i<l; i++) {
+		current = CnvData[i][1]; 
+		if (chromosome !== current) {
+			chromosome = current;
+			chr++;
+		} else {
+			chromosome = current;
+		}
+	}
+	var svg = d3.select("div#svg")
+            .append("svg")
+            .attr("width", 3000)
+            .attr("height", chr* 100 +50);
+
+	var ch = [];
+    ch.length = chr;
+    console.log("chr =", chr)
+	// svg.selectAll("rect")
+	// 	.data(ch)
+	// 	.enter()
+	// 	.append("rect")
+	// 	.attr("x", 60)
+	// 	.attr("y", function (d,i) {
+	// 		return ((i+1) * 100);
+	// 	})
+	// 	.attr("width", function (d,i) {
+	// 		return (l_major_chr_length[i]/1000)
+	// 	})
+	// 	.attr("height", 20)
+	// 	.attr('fill', "white")
+
+	 //Writing some labels :
+    svg.selectAll("text")
+    	.data(ch)
+    	.enter()
+    	.append("text")
+    	.text( function (d, i) {
+    		return "Chr " +  (i+1); 
+    	})
+    	.attr("x",10) 
+    	.attr("y", function (d, i){
+    		return (i+1)* 100 + 10;
+    	})
+    	.attr("font-family", "century")
+   		.attr("border-radius", "16px")
+   		.attr('background-color','#e4e4e4')
+   		.attr("font-size","13px")
+   		.attr("font-weight","500")
+   		.attr("height", "32px")
+   		.attr("color","rgba(0, 0, 0, 0.6)")
+   		.attr("padding","0 12px");
+
    
+
+	ch = [];
+    ch.length = chr;
+	svg.selectAll("rect")
+		.data(ch)
+		.enter()
+		.append("rect")
+		.attr("x", 60)
+		.attr("y", function (d,i) {
+			return ((i+1) * 100);
+		})
+		.attr("width", function (d,i) {
+			return (l_major_chr_length[i]/1000)
+		})
+		.attr("height", 20)
+		.attr('fill', "white");
+
+   	y1 = 0;
+   	var current;
+   	var before = CnvData[0][1];
+   	var avant = CnvData[0][1];
+	var chromo = 1
+	var x1=0;
+	var x2=0;
+	for (i=0; i<CnvData.length; i++) {
+		x1=0
+		x2=0
+		var number = CnvData[i][9];
+		var normal = CnvData[i][3];
+		//console.log("the number is =", number)
+		current = CnvData[i][1];
+		if (current === before) {
+			before = current;
+		}else {
+			before = current;
+			y1++;
+		}
+		if (number === 1) {
+			svg.append("rect")
+				.data([CnvData[i]])
+				.attr("x",(60+ CnvData[i][4]/1000))
+				.attr("y", (y1+1)*100)
+				.attr("width", (CnvData[i][5]- CnvData[i][4])/500)
+				.attr("height",20)
+				.attr("fill","blue")
+				.attr('id', y1+1);
+
+		} else if ((number > 1) && (number <= (CnvData[i][5]-CnvData[i][4]))) {
+			for (var j =0; j<number; j++) {
+				svg.append("rect")
+				    .data([CnvData[i]])
+					.attr("x", 60+ CnvData[i][4]/1000 + x1)
+					.attr("y",  (y1+1)*100)
+					.attr("width", ((CnvData[i][5]-CnvData[i][4])/number)/500)
+					.attr('height',20)
+					.attr("fill", "yellow")
+					.attr('id', y1+1)
+					.attr("stroke", "black")
+					.attr("stroke-width", 1)
+					x1= x1+ ((CnvData[i][5]-CnvData[i][4])/number)/500;
+			}
+
+		} else if ((number >1) && (number > (CnvData[i][5]-CnvData[i][4]))) {
+			console.log("reeeed yaaw !!")
+			for (j = 0; j< number; j++) {
+				svg.append("rect")
+					.data([CnvData[i]])
+					.attr("x",(60+ CnvData[i][4]/1000))
+					.attr("y", (y1+1)*100)
+					.attr("width", (CnvData[i][5]- CnvData[i][4])/500)
+					.attr("height",20)
+					.attr("fill","red")
+					.attr("stroke", "black")
+					.attr("stroke-width", 3)
+					.attr('id', y1+1);
+			}
+		}
+
+		if (normal ===1) {
+			svg.append("rect")
+				.data([CnvData[i]])
+				.attr("x",(60+ CnvData[i][4]/1000))
+				.attr("y", (y1+(3/2))*100)
+				.attr("width", (CnvData[i][5]- CnvData[i][4])/500)
+				.attr("height",20)
+				.attr("fill","blue")
+				.attr('id', "ref");
+		} else if (normal > 1) {
+			for (j =0; j < normal; j++) {
+				svg.append("rect")
+				    .data([CnvData[i]])
+					.attr("x", 60+ CnvData[i][4]/1000 + x2)
+					.attr("y", (y1+(3/2))*100)
+					.attr("width", ((CnvData[i][5]-CnvData[i][4])/number)/500)
+					.attr('height',20)
+					.attr("fill", "yellow")
+					.attr('id', "ref")
+					.attr("stroke", "black")
+					.attr("stroke-width", 1)
+					x2= x2+ ((CnvData[i][5]-CnvData[i][4])/number)/500;
+			}
+		}
+	}
+	$('svg rect').tipsy({ 
+	        gravity: 'w', 
+	        html: true, 
+	        title: function() {
+		        var d = this.__data__;
+		        if( d=== undefined) {
+		         	return "Nothing to report in this position"
+		        } else {
+			         return "Orthomcl Id:"+ d[0] + '<br>' + "Chromosome CNV :"+ d[1] + '<br>' + "Single genome number :"+ d[9] + '<br>' + "Description:" +d[8] + '<br>' 
+			          + '</span>'; 	
+		        }
+	        }
+        });
+
+	$('svg rect#ref').tipsy({ 
+	        gravity: 'w', 
+	        html: true, 
+	        title: function() {
+		        var d = this.__data__;
+		        if( d=== undefined) {
+		         	return "Nothing to report in this position"
+		        } else {
+			         return "Orthomcl Id:"+ d[0] ; 	
+		        }
+	        }
+        });
+
+	svg.selectAll("text")
+    	.data(ch)
+    	.enter()
+    	.append("text")
+    	.text( function (d, i) {
+    		return "Ref_Chr" +  (i+1); 
+    	})
+    	.attr("x",5) 
+    	.attr("y", function (d, i){
+    		return (i+ 1.5)* 100 + 10;
+    	})
+    	.attr("font-family", "century")
+   		.attr("border-radius", "16px")
+   		.attr('background-color','#e4e4e4')
+   		.attr("font-size","13px")
+   		.attr("font-weight","500")
+   		.attr("height", "32px")
+   		.attr("color","rgba(0, 0, 0, 0.6)")
+   		.attr("padding","0 12px")
+ 
 }
