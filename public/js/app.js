@@ -2,13 +2,69 @@ console.log("sanity check");
 var l_major_chr_length = [268988, 355712, 384502, 472852, 465823, 516869, 596352, 574960, 573434, 570865, 
 						  582573, 675346, 654595, 622644, 629517, 714651, 684829, 739748, 702208, 742537,
 						  772972, 716602, 772565, 840950, 912845, 1091540, 1130424, 1160104, 1212663, 1403434,
-						  1484328, 1604637, 1583653, 1866748, 2090474, 2682151]
+						  1484328, 1604637, 1583653, 1866748, 2090474, 2682151];
+var color_panel = ["blue", "red", "yellow", "green", " purple lighten-5", "red accent-1", "cyan lighten-4", "grey lighten-3"];
+var svgDiv='<div id="svgCnv" class="card-panel blue lighten-5 col s6" style="margin-top:50px"></div>'
+var divAddFileCnv ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="CnvDiv"><div class="btn btn1"><span>CNV File</span><input type="file" id="fileinput" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileCNV"><i class="material-icons">add</i></a><button id="sendCnvFile" class="btn btn1" type="submit">Send</button></div>'
+var divAddFileSnp ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="SnpDiv"><div class="btn btn1"><span>SNP File</span><input type="file" id="fileinput" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileSNP"><i class="material-icons">add</i></a><button id="sendSNPFile" class="btn btn1" type="submit">Send</button></div>'
+var divAddFileIndel ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="IndelDiv"><div class="btn btn1"><span>INDEL File</span><input type="file" id="fileinput" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileINDEL"><i class="material-icons">add</i></a><button id="sendIndelFile" class="btn btn1" type="submit">Send</button></div>'
+var delButton ='<a class="btn-floating btn-small waves-effect waves-light delFileBtn"><i class="material-icons">highlight_off</i></a>'
+var checkBoxeIsolatCNV='<input type="checkbox" id="isolat" class="checkIs" checked=""/><label id="lab" for="isolat">Isolat</label>'
+
 $(document).ready(function() {
 	pageLoad();
 });
 
 function pageLoad() {
 
+	$('select').material_select();
+	//adding files input
+	var divNumber=[0,0,0]
+	$(document).on("click",'.addFileBtn', function (event) {
+		event.preventDefault();
+		var typeId = $(this).attr('id'); 
+		switch (typeId) {
+			case "addFileCNV": {
+				divNumber[0]++;
+				plusButtonEffect("sendCnvFile", typeId, "CnvInput", divAddFileCnv, "CnvDiv", "DivC", divNumber[0]);
+			}
+			break;
+			case "addFileSNP": {
+				divNumber[1]++;
+				plusButtonEffect("sendSNPFile", typeId, "SNPInput",divAddFileSnp, "SNPDiv", "DivS", divNumber[1]);
+			} 
+			break;
+			case "addFileINDEL": {
+				divNumber[2]++;
+				plusButtonEffect("sendIndelFile", typeId, "INDELInput",divAddFileIndel, "IndelDiv", "DivI", divNumber[2]);
+			} 
+			break;
+		}
+		// $("#sendCnvFile").remove();
+		// $(".addFileBtn").remove();
+		// $(".CnvInput").append(divAddFile);
+		// $(".Divv").attr("id", "CnvDiv"+ divNumber);
+		// $(".Divv").attr("class", "file-field input-field Divv"+ divNumber);
+		// $('#CnvDiv'+(divNumber-1)).append(delButton);
+	})
+
+	//one function for adding the files input of each type.
+	function plusButtonEffect(sendButtonId, addButtonId, formClass,divAddFile, divIdName, generalClass, divNumber ) {
+		$("#"+sendButtonId).remove();
+		$("#"+addButtonId).remove();
+		$('.'+ formClass).append(divAddFile);
+		$(".Divv").attr('id', divIdName + divNumber);
+		$('.Divv').attr("class", "file-field input-field "+generalClass +""+ divNumber );
+		$("#"+divIdName+""+(divNumber-1)).append(delButton)
+	}
+
+	//deleting file's input
+	$(document).on("click",".delFileBtn", function (event) {
+		var par = $(this).parent()
+		$(par).parent().remove();
+	})
+
+	//gff representation 
 	$(".gffInput").on('submit', function (event) {
 		event.preventDefault();
 		var data = new FormData(this)
@@ -36,25 +92,36 @@ function pageLoad() {
 	    
 	})
 
-	$(".CnvInput").on("submit", function (event) {
+	$(document).on("submit",".CnvInput", function (event) {
 		event.preventDefault();
 		var data = new FormData(this);
+		$('.svgg').remove();
 		$.ajax('/CnvData', {
 			type: 'POST',
 			data: data,
 			processData: false,
 			contentType: false,
 			success: function (response) {
-
-				 for (var i=0; i< response.length; i++) {
-				 	response[i][2]= parseInt(response[i][2])
-				 	response[i][3]= parseInt(response[i][3])
-				 	response[i][4]= parseInt(response[i][4])
-				 	response[i][5]= parseInt(response[i][5])
-				 	response[i][9]= parseInt(response[i][9])
-				 	response[i][10] = parseInt(response[i][10])
-				 }
-				drawCNV(response);
+				var l = response.length
+				console.log("the length is", l)
+					for (var i=0; i< l; i++) {
+					 	var ll= response[i].length
+					 	for (var j=0; j<ll; j++) {
+					 		response[i][j][2]= parseInt(response[i][j][2])
+						 	response[i][j][3]= parseInt(response[i][j][3])
+						 	response[i][j][4]= parseInt(response[i][j][4])
+						 	response[i][j][5]= parseInt(response[i][j][5])
+						 	response[i][j][9]= parseInt(response[i][j][9])
+						 	response[i][j][10] = parseInt(response[i][j][10])
+					 	}
+						drawCNV(response[i],i);
+						$(".checkBoxCnv").append(checkBoxeIsolatCNV);
+						$('#isolat').attr('id', "isolatCNV"+i);
+						$("#lab").attr('id', "lab"+i);
+						$("#lab"+i).text("Isolat "+ (i+1));
+						$("#lab"+i).attr("for", "isolatCNV"+i)
+					}
+				// 
 			},
 			error: function (response) {
 
@@ -63,7 +130,94 @@ function pageLoad() {
 
 			}
 		})
+
 	})
+
+	$(document).on("submit", ".SNPInput", function (event) {
+		event.preventDefault();
+		var data = new FormData(this);
+		$.ajax('/SnpData', {
+			type: 'POST',
+			data: data,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+				
+			}
+		})
+	})
+
+	//hidind and showing the svg
+	$(document).on("change", ".checkIs", function (event) {
+		console.log("the id is", this.id)
+		var prop = $("#"+this.id).prop("checked");
+		var number = this.id[((this.id).length)-1]
+		var parent = $("#"+this.id).parent().attr("class");
+		if (prop === false) {
+			if (parent === "checkBoxCnv") {
+				$('#svgCnv'+number).hide();
+			} else if (parent === "checkBoxSnp") {
+
+			} else if (parent === "checkBoxIndel") {
+
+			}
+
+		} else {
+			if (parent === "checkBoxCnv") {
+				$('#svgCnv'+number).show();
+			} else if (parent === "checkBoxSnp") {
+
+			} else if (parent === "checkBoxIndel") {
+
+			}
+
+		}
+	})
+
+	$(document).on("change", "#selChrCnv", function (event) {
+		var selectedVal= $(event.target).val();
+		console.log(selectedVal)
+		var  l = selectedVal.length;
+		var chr = $('select#selChrCnv option').length -1
+		console.log('le nombre de chr =', chr)
+		var v = $('#contcnv').children().length;
+		console.log("le nombdre de div =", v)
+		var tempo = 0
+		for (var j=1; j<=chr; j++) {
+			if (tempo === l) {
+				for (k=1; k<=v; k++) {
+					$('rect#ref'+""+k+""+j).hide();
+					$('rect#cadre'+""+k+""+j).hide();
+					$('rect#chr'+""+k+""+j).hide();
+					$("text#txt"+""+k+""+j).hide();
+				//hiding all the chr(j)
+				}
+			} else {
+				if (j === parseInt(selectedVal[tempo])) {
+				tempo++;
+				for(var k=1; k<=v; k++) {
+					$('rect#chr'+""+k+""+j).show();
+					$('rect#cadre'+""+k+""+j).show();
+					$('rect#ref'+""+k+""+j).show();
+					$("text#txt"+""+k+""+j).show();
+					//showing all the rect and texts
+				}
+				} else {
+					for (k=1; k<=v; k++) {
+						$('rect#ref'+""+k+""+j).hide();
+						$('rect#cadre'+""+k+""+j).hide();
+						$('rect#chr'+""+k+""+j).hide();
+						$("text#txt"+""+k+""+j).hide();
+					//hiding all the chr(j)
+					}
+				
+				}
+
+			}
+			
+			
+		}
+})
 
 }
 
@@ -205,8 +359,14 @@ function drawChromosomes(gffData) {
 }
 
 //Drawing CNVs function
-function drawCNV(CnvData) {
+function drawCNV(CnvData, v) {
     CnvData.splice(0,1);
+    var random =  Math.floor((Math.random() *8))
+    $("div#contcnv").append(svgDiv);
+    $("div#svgCnv").attr("id","svgCnv"+v);
+    $("div#svgCnv"+v).attr("class","card-panel "+ color_panel[random] +" col s6 svgg" );
+    $("div#svgCnv"+v).append("<h4 class='center'> Isolat " + (v+1) + "</h4>")
+    
     var l = CnvData.length;
     var current;
     console.log(l);
@@ -221,10 +381,23 @@ function drawCNV(CnvData) {
 			chromosome = current;
 		}
 	}
-	var svg = d3.select("div#svg")
+
+	if (v ===0) {
+		//here we will add the multiple selection option dependeing on the chromosome number
+		var select1 = document.getElementById("selChrCnv");
+	    for (var j=0; j< chr; j++) {
+	    	select1.options[select1.options.length] = new Option('Chromosome '+ (j+1) , (j+1));
+	    }
+	    $(select1).material_select();
+		$(".selectChr").css("visibility", "visible");
+	}
+
+
+	//Starting drawing the svg
+	var svg = d3.select("div#svgCnv"+v)
             .append("svg")
-            .attr("width", 3000)
-            .attr("height", chr* 100 +50);
+            .attr("width", 1000)
+            .attr("height", chr* 100 +100);
 
 	var ch = [];
     ch.length = chr;
@@ -255,6 +428,9 @@ function drawCNV(CnvData) {
     	.attr("y", function (d, i){
     		return (i+1)* 100 + 10;
     	})
+    	.attr('id', function (d, i) {
+			return "txt"+(v+1)+(i+1)
+		})
     	.attr("font-family", "century")
    		.attr("border-radius", "16px")
    		.attr('background-color','#e4e4e4')
@@ -280,6 +456,9 @@ function drawCNV(CnvData) {
 			return (l_major_chr_length[i]/1000)
 		})
 		.attr("height", 20)
+		.attr('id', function (d,i) {
+			return 'cadre'+(v+1)+(i+1)
+		})
 		.attr('fill', "white");
 
    	y1 = 0;
@@ -289,7 +468,8 @@ function drawCNV(CnvData) {
 	var chromo = 1
 	var x1=0;
 	var x2=0;
-	for (i=0; i<CnvData.length; i++) {
+	var lon= CnvData.length
+	for (i=0; i<lon; i++) {
 		x1=0
 		x2=0
 		var number = CnvData[i][9];
@@ -310,7 +490,7 @@ function drawCNV(CnvData) {
 				.attr("width", (CnvData[i][5]- CnvData[i][4])/500)
 				.attr("height",20)
 				.attr("fill","blue")
-				.attr('id', y1+1);
+				.attr('id','chr'+(v+1)+(y1+1));
 
 		} else if ((number > 1) && (number <= (CnvData[i][5]-CnvData[i][4]))) {
 			for (var j =0; j<number; j++) {
@@ -321,7 +501,7 @@ function drawCNV(CnvData) {
 					.attr("width", ((CnvData[i][5]-CnvData[i][4])/number)/500)
 					.attr('height',20)
 					.attr("fill", "yellow")
-					.attr('id', y1+1)
+					.attr('id', 'chr'+(v+1)+(y1+1))
 					.attr("stroke", "black")
 					.attr("stroke-width", 1)
 					x1= x1+ ((CnvData[i][5]-CnvData[i][4])/number)/500;
@@ -339,7 +519,7 @@ function drawCNV(CnvData) {
 					.attr("fill","red")
 					.attr("stroke", "black")
 					.attr("stroke-width", 3)
-					.attr('id', y1+1);
+					.attr('id', 'chr'+(v+1)+(y1+1));
 			}
 		}
 
@@ -351,7 +531,7 @@ function drawCNV(CnvData) {
 				.attr("width", (CnvData[i][5]- CnvData[i][4])/500)
 				.attr("height",20)
 				.attr("fill","blue")
-				.attr('id', "ref");
+				.attr('id', "ref"+(v+1)+(y1+1));
 		} else if (normal > 1) {
 			for (j =0; j < normal; j++) {
 				svg.append("rect")
@@ -361,7 +541,7 @@ function drawCNV(CnvData) {
 					.attr("width", ((CnvData[i][5]-CnvData[i][4])/number)/500)
 					.attr('height',20)
 					.attr("fill", "yellow")
-					.attr('id', "ref")
+					.attr('id', "ref"+(v+1)+(y1+1))
 					.attr("stroke", "black")
 					.attr("stroke-width", 1)
 					x2= x2+ ((CnvData[i][5]-CnvData[i][4])/number)/500;
