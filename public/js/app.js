@@ -5,9 +5,9 @@ var l_major_chr_length = [268988, 355712, 384502, 472852, 465823, 516869, 596352
 						  1484328, 1604637, 1583653, 1866748, 2090474, 2682151];
 var color_panel = ["blue", "red", "yellow", "green", " purple lighten-5", "red accent-1", "cyan lighten-4", "grey lighten-3"];
 var svgDiv='<div id="svgCnv" class="card-panel blue lighten-5 col s6" style="margin-top:50px"></div>'
-var divAddFileCnv ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="CnvDiv"><div class="btn btn1"><span>CNV File</span><input type="file" id="fileinput" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileCNV"><i class="material-icons">add</i></a><button id="sendCnvFile" class="btn btn1" type="submit">Send</button></div>'
-var divAddFileSnp ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="SnpDiv"><div class="btn btn1"><span>SNP File</span><input type="file" id="fileinput" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileSNP"><i class="material-icons">add</i></a><button id="sendSNPFile" class="btn btn1" type="submit">Send</button></div>'
-var divAddFileIndel ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="IndelDiv"><div class="btn btn1"><span>INDEL File</span><input type="file" id="fileinput" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileINDEL"><i class="material-icons">add</i></a><button id="sendIndelFile" class="btn btn1" type="submit">Send</button></div>'
+var divAddFileCnv ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="CnvDiv"><div class="btn btn1"><span>CNV File</span><input type="file" id="fileinputCNV" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileCNV"><i class="material-icons">add</i></a><button id="sendCnvFile" class="btn btn1" type="submit">Send</button></div>'
+var divAddFileSnp ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="SnpDiv"><div class="btn btn1"><span>SNP File</span><input type="file" id="fileinputSNP" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileSNP"><i class="material-icons">add</i></a><button id="sendSNPFile" class="btn btn1" type="submit">Send</button></div>'
+var divAddFileIndel ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="IndelDiv"><div class="btn btn1"><span>INDEL File</span><input type="file" id="fileinputINDEL" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileINDEL"><i class="material-icons">add</i></a><button id="sendIndelFile" class="btn btn1" type="submit">Send</button></div>'
 var delButton ='<a class="btn-floating btn-small waves-effect waves-light delFileBtn"><i class="material-icons">highlight_off</i></a>'
 var checkBoxeIsolatCNV='<input type="checkbox" id="isolat" class="checkIs" checked=""/><label id="lab" for="isolat">Isolat</label>'
 
@@ -95,56 +95,77 @@ function pageLoad() {
 	$(document).on("submit",".CnvInput", function (event) {
 		event.preventDefault();
 		var data = new FormData(this);
-		$('.svgg').remove();
-		$.ajax('/CnvData', {
-			type: 'POST',
-			data: data,
-			processData: false,
-			contentType: false,
-			success: function (response) {
-				var l = response.length
-				console.log("the length is", l)
-					for (var i=0; i< l; i++) {
-					 	var ll= response[i].length
-					 	for (var j=0; j<ll; j++) {
-					 		response[i][j][2]= parseInt(response[i][j][2])
-						 	response[i][j][3]= parseInt(response[i][j][3])
-						 	response[i][j][4]= parseInt(response[i][j][4])
-						 	response[i][j][5]= parseInt(response[i][j][5])
-						 	response[i][j][9]= parseInt(response[i][j][9])
-						 	response[i][j][10] = parseInt(response[i][j][10])
-					 	}
-						drawCNV(response[i],i);
-						$(".checkBoxCnv").append(checkBoxeIsolatCNV);
-						$('#isolat').attr('id', "isolatCNV"+i);
-						$("#lab").attr('id', "lab"+i);
-						$("#lab"+i).text("Isolat "+ (i+1));
-						$("#lab"+i).attr("for", "isolatCNV"+i)
-					}
-				// 
-			},
-			error: function (response) {
+		if ( document.getElementById('fileinputCNV').files.length === 0) {
+			sweetAlert("oups..","No file is uploaded, please upload at least one file", "error");
+		} else {
+			$('.svgg').remove();
+			$.ajax('/CnvData', {
+				type: 'POST',
+				data: data,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					var l = response.length
+					console.log("the length is", l)
+						for (var i=0; i< l; i++) {
+						 	var ll= response[i].length
+						 	for (var j=0; j<ll; j++) {
+						 		response[i][j][2]= parseInt(response[i][j][2])
+							 	response[i][j][3]= parseInt(response[i][j][3])
+							 	response[i][j][4]= parseInt(response[i][j][4])
+							 	response[i][j][5]= parseInt(response[i][j][5])
+							 	response[i][j][9]= parseInt(response[i][j][9])
+							 	response[i][j][10] = parseInt(response[i][j][10])
+						 	}
+							drawCNV(response[i],i);
+							$(".checkBoxCnv").append(checkBoxeIsolatCNV);
+							$('#isolat').attr('id', "isolatCNV"+i);
+							$("#lab").attr('id', "lab"+i);
+							$("#lab"+i).text("Isolat "+ (i+1));
+							$("#lab"+i).attr("for", "isolatCNV"+i)
+						}
+					// 
+				},
+				error: function (response) {
 
-			}, 
-			complete : function (resultat, statut) {
+				}, 
+				complete : function (resultat, statut) {
 
-			}
-		})
+				}
+			})
+		}
+		
 
 	})
 
 	$(document).on("submit", ".SNPInput", function (event) {
 		event.preventDefault();
 		var data = new FormData(this);
-		$.ajax('/SnpData', {
-			type: 'POST',
-			data: data,
-			processData: false,
-			contentType: false,
-			success: function (response) {
-				
-			}
-		})
+		if ( document.getElementById('fileinputSNP').files.length === 0) {
+			sweetAlert("oups..","No file is uploaded, please upload at least one file", "error");
+		} else {
+			$.ajax('/SnpData', {
+				type: 'POST',
+				data: data,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					var l = response.length
+					for (var k =0; k<l; k++) {
+						drawSNP(response[k],k)
+					
+					}
+
+
+				}, error: function (response) {
+
+				},
+				complete :function (resultat, statut) {
+
+				}
+			})
+		} 
+			
 	})
 
 	//hidind and showing the svg
@@ -220,6 +241,7 @@ function pageLoad() {
 })
 
 }
+
 
 //this function is to correct the data (the chromosome numbers)
 function correctGff(gffData) {
@@ -368,20 +390,20 @@ function drawCNV(CnvData, v) {
     $("div#svgCnv"+v).append("<h4 class='center'> Isolat " + (v+1) + "</h4>")
     
     var l = CnvData.length;
-    var current;
-    console.log(l);
-	var chr=1;
-	var chromosome = CnvData[0][1];
-	for (var i=0; i<l; i++) {
-		current = CnvData[i][1]; 
-		if (chromosome !== current) {
-			chromosome = current;
-			chr++;
-		} else {
-			chromosome = current;
-		}
-	}
-
+ //    var current;
+ //    console.log(l);
+	// var chr=1;
+	// var chromosome = CnvData[0][1];
+	// for (var i=0; i<l; i++) {
+	// 	current = CnvData[i][1]; 
+	// 	if (chromosome !== current) {
+	// 		chromosome = current;
+	// 		chr++;
+	// 	} else {
+	// 		chromosome = current;
+	// 	}
+	// }
+	var chr = CountChrNumber(CnvData,1)
 	if (v ===0) {
 		//here we will add the multiple selection option dependeing on the chromosome number
 		var select1 = document.getElementById("selChrCnv");
@@ -595,4 +617,29 @@ function drawCNV(CnvData, v) {
    		.attr("color","rgba(0, 0, 0, 0.6)")
    		.attr("padding","0 12px")
  
+}
+
+//drawing the snps
+function drawSNP(SNPfile, v) {
+	var chr = CountChrNumber(SNPfile, 0);
+	
+}
+
+
+//Counting the chromosome number present in the file
+function CountChrNumber(file, indice) {
+	var chr=1;
+	var current;
+	var chromosome = file[0][indice];
+	var l = file.length;
+	for (var i=0; i<l; i++) {
+		current = file[i][indice]; 
+		if (chromosome !== current) {
+			chromosome = current;
+			chr++;
+		} else {
+			chromosome = current;
+		}
+	}
+	return chr;
 }
