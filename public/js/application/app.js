@@ -4,24 +4,22 @@ var l_major_chr_length = [268988, 355712, 384502, 472852, 465823, 516869, 596352
 						  582573, 675346, 654595, 622644, 629517, 714651, 684829, 739748, 702208, 742537,
 						  772972, 716602, 772565, 840950, 912845, 1091540, 1130424, 1160104, 1212663, 1403434,
 						  1484328, 1604637, 1583653, 1866748, 2090474, 2682151];
-var color_panel = ["blue", "red", "yellow", "green", " purple lighten-5", "red accent-1", "cyan lighten-4", "grey lighten-3"];
-var svgDiv='<div id="svgCnv" class="card-panel blue lighten-5 col s6" style="margin-top:50px"></div>'
 var divAddFileCnv ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="CnvDiv"><div class="btn btn1"><span>CNV File</span><input type="file" id="fileinputCNV" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileCNV"><i class="material-icons">add</i></a><button id="sendCnvFile" class="btn btn1" type="submit">Send</button></div>'
 var divAddFileSnp ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="SnpDiv"><div class="btn btn1"><span>SNP File</span><input type="file" id="fileinputSNP" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileSNP"><i class="material-icons">add</i></a><button id="sendSNPFile" class="btn btn1" type="submit">Send</button></div>'
 var divAddFileIndel ='<div class= "col s12 offset-s3"><div class="file-field input-field  Divv" id="IndelDiv"><div class="btn btn1"><span>INDEL File</span><input type="file" id="fileinputINDEL" name="file" multiple></div><div class="file-path-wrapper col s3"><input class="file-path validate" type="text"></div></div><a class="btn-floating btn-small waves-effect waves-light addFileBtn" id="addFileINDEL"><i class="material-icons">add</i></a><button id="sendIndelFile" class="btn btn1" type="submit">Send</button></div>'
 var delButton ='<a class="btn-floating btn-small waves-effect waves-light delFileBtn"><i class="material-icons">highlight_off</i></a>'
-var checkBoxeIsolatCNV='<input type="checkbox" id="isolat" class="checkIs" checked=""/><label id="lab" for="isolat">Isolat</label>'
-var checkBoxRef='<input type="checkbox" id="reference" class="refIs" checked=""/><label id="lab" for="reference">Ref</label>'
 
 $(document).ready(function() {
 	pageLoad();
-	$.page_zoom();
+	$('.slider').slider({full_width: true});
+	$('.parallax').parallax();
 	$('.modal-trigger').leanModal({
       dismissible: true, // Modal can be dismissed by clicking outside of the modal
       opacity: .5, // Opacity of modal background
       in_duration: 300, // Transition in duration
       out_duration: 200, // Transition out duration
     });
+    $(".button-collapse").sideNav();
 	$('select').material_select();
 })
 
@@ -30,6 +28,7 @@ function pageLoad() {
 	var divNumber=[0,0,0]
 	$(document).on("click",'.addFileBtn', function (event) {
 		event.preventDefault();
+		console.log("clicked")
 		var typeId = $(this).attr('id'); 
 		switch (typeId) {
 			case "addFileCNV": {
@@ -187,7 +186,6 @@ function pageLoad() {
 		}
     })
 }
-
 
 //one function for adding the files input of each type.
 function plusButtonEffect(sendButtonId, addButtonId, formClass,divAddFile, divIdName, generalClass, divNumber ) {
