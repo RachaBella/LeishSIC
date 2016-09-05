@@ -29,13 +29,7 @@ var userSchema = new Schema({
 		type:String,
 		require:true,
 		unique:true
-	},
-	actionsHistorique:[
-		{type: Schema.Types.ObjectId, ref: "Historique"
-		}],
-	tempFile:[
-		{type: Schema.Types.ObjectId, ref: "Temp"
-		}]
+	}
 });
 
 userSchema.statics.checklogin = function (userName, callback) {
@@ -80,8 +74,6 @@ userSchema.statics.createSecure = function (firstName, lastName, userName, passw
 		        userName:userName,	
 		        email: email,
 		        password_digest: hash,
-		        actionsHistorique:[],
-		        tempFile:[],
 		        }, callback);
 		});
 	});

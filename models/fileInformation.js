@@ -3,13 +3,19 @@ var mongoose = require("mongoose"),
 	actionsHistorique= require("./actionsHistorique.js");
 
 var fileSchema = new Schema({
-	_historique: {
-		type: Schema.Types.ObjectId, ref: "Historique"
+	fileType: {
+		type:String
+	},
+	fileSize: {
+		type:String
 	},
 	fileName: {
 		type:String
 	},
 	filePath: {
+		type:String
+	},
+	uploadDate: {
 		type:String
 	}
 })
