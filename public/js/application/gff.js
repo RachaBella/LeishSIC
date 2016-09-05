@@ -18,7 +18,7 @@ function pageLoadGff(){
 	      processData: false,
 	      contentType: false,
 	      success : function (response) {
-	      	if (response ==="ERROR") {
+	      	if (response.message ==="Error") {
 	      		alert("Une erreur s'est produite, veuillez re Uploader votre fichier !");
 	      	}
 	      	else {

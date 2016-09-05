@@ -1,14 +1,65 @@
 console.log("sanity check log");
 var regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$/
+var options = [
+		    {selector: '#infoImg', offset: 300, callback: 'Materialize.fadeInImage("#infoImg")'},
+		    {selector: '#head', offset: 350, callback: 'Materialize.showStaggeredList("#head")'},
+		    {selector: '#head2', offset: 400, callback: 'Materialize.showStaggeredList("#head2")'},
+		    {selector: ".iAcceuil1", offset:451, callback: 'Materialize.fadeInImage(".iAcceuil1")'},
+		    {selector: ".iAcceuil2", offset:452, callback: 'Materialize.fadeInImage(".iAcceuil2")'},
+		    {selector: ".iAcceuil3", offset:500, callback: 'Materialize.fadeInImage(".iAcceuil3")'},
+		    {selector: '#head3', offset: 400, callback: 'Materialize.showStaggeredList("#head3")'},
+		    {selector: "#Tour", offset:400, callback: 'Materialize.fadeInImage("#Tour")'}
+
+		  ];
+
 
 $(document).ready(function() {
 	//we always check first the session
+	Materialize.scrollFire(options);
+	$(window).scroll( function() {
+ 	 	if (($(document).scrollTop() > 50 ) &&( $(document).scrollTop()  <100 )) {
+ 	 		$(".navbar-fixed").css("opacity","0.8")
+ 	 	} else if ($(document).scrollTop() < 50) {
+ 	 		$('.fixed-action-btn').hide("fast");
+ 	 		$(".navbar-fixed").css("opacity","1");
+ 	 	} else if ($(document).scrollTop() > 100) {
+ 	 		$('.fixed-action-btn').show("fast");
+ 	 	}
+ 	});
+	$('.carousel.carousel-slider').carousel({full_width: true});
+	$(".button-collapse").sideNav();
+	$('.parallax').parallax();
+	$('.modal-trigger').leanModal({
+      dismissible: true, // Modal can be dismissed by clicking outside of the modal
+      opacity: .5, // Opacity of modal background
+      in_duration: 300, // Transition in duration
+      out_duration: 200, // Transition out duration
+    });
 	var user = checkSession(); 
 	pageLog(user);
 	$('.tooltipped').tooltip({delay: 50});
 });
 
+function animation1() {
+	
+    $('.iAcceuil3').slideDown("slow")
+
+}
+
 function pageLog() {
+
+	//scrolling functions
+	$("#scroll").on("click", function () {
+		$('html, body').animate({
+            scrollTop: $("#info").offset().top
+        }, 800);
+	})
+
+	$(".tour").on("click", function () {
+		$('html, body').animate({
+            scrollTop: $("#Tour").offset().top
+        }, 800);
+	})
 
 	$('#logIn').attr("class", "modal-action modal-close waves-effect waves-green btn-flat")
 	$("#loginForm").on("submit", function (event) {
@@ -68,11 +119,13 @@ function pageLog() {
 		event.preventDefault();
 		$.get('/logout', function (response) {
 			//console.log("the logout response is = ", response)
-			logout();
-			swal("Logged Out!", "Your are now logged out", "success");
-			window.location.href="/" 
-			
-			
+			if (response.message ==="Error") {
+				sweetAlert("Error", "An error occured, try logging out again!", "error");
+			} else {
+				logout();
+				swal("Logged Out!", "Your are now logged out", "success");
+				window.location.href="/" 
+			}	
 		})
 	})
 
@@ -109,15 +162,21 @@ function changeName(name) {
 	$('.log').remove();
 	$(".sig").remove();
 	$("#starta").prop("href", "/"+ name + "/upload" )
+	$(".upLink").attr("href", "/"+ name + '/upload');
+	$(".anLink").attr("href", "/"+ name + '/analyze');
+	$(".visLink").attr("href", "/"+ name + '/visualize');
 	$(".parent").prepend('<li class="Ulog"><a href="/"><i  class="material-icons left ">exit_to_app</i>Logout</a></li>')
-	$(".parent").prepend('<li class="Uname"><a href="/profile/'+name +'" id="uName"><i  class="material-icons left ">account_circle</i>'+name+'</a></li>')
+	$(".parent").prepend('<li class="Uname"><a href="/profile/'+name +'" id="uName"><i class="material-icons left">account_circle</i>'+name+' </a></li>')
 	$(".parentM").prepend('<li class="Ulog"><a href="/"><i class="material-icons left myIcon ">exit_to_app</i>Logout</a></li>')
-	$(".parentM").prepend('<li class="Uname"><a href="/profile/"'+name +'" id="uNameM"><i class="material-icons left myIcon ">account_circle</i>'+name+'</a></li>')
+	$(".parentM").prepend('<li class="Uname"><a href="/profile/'+name +'" id="uNameM"><i class="material-icons left myIcon =">account_circle</i>'+name+'</a></li>')
 }
 
 function logout() {
 	$('.Ulog').remove();
 	$(".Uname").remove();
+	$(".upLink").attr("href", "/");
+	$(".anLink").attr("href", "/");
+	$(".visLink").attr("href", "/");
 	$(".parent").prepend('<li class="sig"><a href="#signup"  class="modal-trigger"><i class="material-icons left ">person_add</i>Signup</a></li>')
 	$(".parent").prepend('<li class="log"><a href="#login" class="modal-trigger" ><i class="material-icons left">account_circle</i>Login</a></li>')
 	$(".parentM").prepend('<li class="sig"><a  data-target="#signup" class="modal-trigger"><i class="material-icons left myIcon ">person_add</i>Signup</a></li>')
@@ -134,6 +193,7 @@ function checkSession() {
 	$.get('/current_user', function (response) {
 		if (response.user) {
 			changeName(response.user.userName);
+			// getFilesSelect(response.user._id)
 			return response.user
 		} else if (response.user === null) {
 			$.get('/', function (response) {	
