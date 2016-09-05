@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Analyse</title>
+       <meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>LeishSIC</title>
+
+		<!-- Compiled and minified CSS -->
+  		<link rel="stylesheet" href="/static/CSS/materialize.min.css">
+  		<link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+  		<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  		<link rel="stylesheet" type="text/css" href="/static/CSS/styleAn.css">
+		<link rel="stylesheet" type="text/css" href="/static/CSS/stlyle.css">
+		<link rel="stylesheet" type="text/css" href="/static/CSS/style.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/sweetalert2/1.3.0/sweetalert2.min.css">
+			<!--Import Google Icon Font-->
+		<link rel="SHORTCUT ICON" href="/static/img/favicon.ico"/>
+      	<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+  </head>
+
+ <body>
+	<div class="navbar-fixed">
+			<nav class="navv">
+			    <div class="nav-wrapper">
+			      <a href="/" class="brand-logo">LeishSIC</a>
+			      <a href="#" data-activates="mobile-demo" class="button-collapse" data-sidenav="left" data-menuwidth="500" data-closeonclick="false"><i class="material-icons">more_vert</i></a>
+			      <ul class="right hide-on-med-and-down parent">
+			        <li class="log"><a href="#login" class="modal-trigger" ><i  class="material-icons left ">account_circle</i>Login</a></li>
+			        <li class="sig"><a href="#signup"  class="modal-trigger"><i class="material-icons left ">person_add</i>Signup</a></li>
+			        <li class="tour"><a href="#"class="tour"><i class="material-icons left ">play_circle_outline</i>Tour</a></li>
+			        <li class="support"><a href="/support" class="support"><i class="material-icons left ">build</i>Support</a></li>
+			        <li><a href="#footer" ><i class="material-icons left">info_outline</i>About</a></li>
+			        
+			       
+			      </ul>
+			      <ul class="left side-nav parentM" id="mobile-demo">
+			        <li class="log"><a  data-target="#login" href="#login" class="modal-trigger"><i class="material-icons left myIcon ">account_circle</i>Login</a></li>
+			        <li class="sig"><a  data-target="#signup" href="#signup"class="modal-trigger"><i class="material-icons left myIcon ">person_add</i>Signup</a></li>
+			        <!-- <li><a href="/analyze" target="_blank"><i class="material-icons left myIcon">bubble_chart</i>Analyze</a></li>
+			        -->
+			        <li class="tour"><a href="#" class="tour"><i class="material-icons left myIcon">play_circle_outline</i>Tour</a></li>
+			         <li class="support"><a href="/support" class="support"><i class="material-icons left myIcon">build</i>Support</a></li>
+			        <li><a href="#footer" data-scroll><i class="material-icons left myIcon">info_outline</i>About</a></li>
+			
+			        
+			        </li>
+			        <br>
+			        <br>
+		        	<div class=" container center">
+		        		<ul>
+		        			<li class="cyan-text">Contact Information</li>
+		        			<hr>
+					      	<li class="black-text">racha@womenwhocode.com</li>
+					      	<li class="black-text">bs_benouadah@esi.dz</li>
+		        		</ul>
+		        	</div>
+			      </ul>
+			    
+
+			    </div>
+			</nav>	
+		</div>
+		<div class="card-panel myCard center">
+	          <span class="white-text">This is the space where you can analyze all your uploaded Fastq and Fasta files. Choose the available steps for you, then click the start button. For each step, you can download the resulted file.
+	          </span>
+		</div>
+		<div id="analyseChoice" class="double-buttons">
+			<a class="double-button double-button-1" onclick="analyseDNA()">
+				DNA-Seq
+			</a>
+			<span class="button_or">or</span>
+			<a 	class="double-button double-button-2" onclick="analyseRNA()">
+				RNA-Seq
+			</a>
+		</div>
+		<div id="analyseChoiceR" class="double-buttons" style="display:none">
+			<a class="double-button double-button-3" disabled>
+				DNA-Seq
+			</a>
+			<button class="round-button"  onclick="goBack()"><i class="material-icons">restore page</i></button>
+		</div>
+		<div id="analyseActivate" style="display:none">
+		<ul  class="tabsAn" >
+			<li ><button id="dna-qc" href="#" class="tabsAn-a" ><i class="material-icons">settings</i>Quality Control</button>
+				<ul class="menu ul-first">
+					<li>
+						<div id="dna-qc-C" class="dna-progress-container-relative" >
+							<!-- progress-dna -->
+							<div class="dna-container-relative" >
+								<div id="dna-qc-D" class="dna-container">  
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+								</div> 
+							</div> 
+							<!-- progress-bar -->
+							<div class="progress-container">
+								<div id="dna-qc-P" class="progress">
+									<b class="progress__bar">
+										<span class="progress__text">
+											Progress: <em>0%</em>
+										</span>
+									</b>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>Processing...</p>
+					</li>
+					<li>
+						<div class="clearfix">
+							<button href="#" class="btn-download btn-syle" disabled>Download</button>
+							<button href="#" class="btn-start btn-syle" >Start</button>
+						</div>
+					</li>
+				</ul>
+			</li>
+			
+			<li><button id="dna-clf" href="#" class="tabsAn-a"><i class="material-icons">settings</i>Cleaning Fastq</button>
+				<ul class="menu ul-first">
+					<li>
+						<div id="dna-clf-C" class="dna-progress-container-relative" >
+							<!-- progress-dna -->
+							<div class="dna-container-relative" >
+								<div id="dna-clf-D" class="dna-container">  
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+								</div> 
+							</div> 
+							<!-- progress-bar -->
+							<div class="progress-container">
+								<div id="dna-clf-P" class="progress">
+									<b class="progress__bar">
+										<span class="progress__text">
+											Progress: <em>0%</em>
+										</span>
+									</b>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>Processing...</p>
+					</li>
+					<li>
+						<div class="clearfix">
+							<button href="#" class="btn-download btn-syle" disabled>Download</button>
+							<button href="#" class="btn-start btn-syle" >Start</button>
+						</div>
+					</li>
+				</ul>
+			</li>
+			
+			<li><button id="dna-al" href="#" class="tabsAn-a"><i class="material-icons">settings</i>Alignment</button>
+				<ul class="menu ul-first">
+					<li>
+						<div id="dna-al-C" class="dna-progress-container-relative" >
+							<!-- progress-dna -->
+							<div  class="dna-container-relative" >
+								<div id="dna-al-D" class="dna-container">  
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+								</div> 
+							</div> 
+							<!-- progress-bar -->
+							<div class="progress-container">
+								<div id="dna-al-P" class="progress">
+									<b class="progress__bar">
+										<span class="progress__text">
+											Progress: <em>0%</em>
+										</span>
+									</b>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>Processing...</p>
+					</li>
+					<li>
+						<div class="clearfix">
+							<button href="#" class="btn-download btn-syle" disabled>Download</button>
+							<button href="#" class="btn-start btn-syle" >Start</button>
+						</div>
+					</li>
+				</ul>
+			</li>
+			
+			<li><button id="dna-cv" href="#" class="tabsAn-a"><i class="material-icons">settings</i>Conversion</button>
+				<ul class="menu ul-first">
+					<li>
+						<div id="dna-cv-C" class="dna-progress-container-relative" >
+							<!-- progress-dna -->
+							<div class="dna-container-relative" >
+								<div id="dna-cv-D" class="dna-container">  
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+								</div> 
+							</div> 
+							<!-- progress-bar -->
+							<div class="progress-container">
+								<div id="dna-cv-P" class="progress">
+									<b class="progress__bar">
+										<span class="progress__text">
+											Progress: <em>0%</em>
+										</span>
+									</b>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>Processing...</p>
+					</li>
+					<li>
+						<div class="clearfix">
+							<button href="#" class="btn-download btn-syle" disabled>Download</button>
+							<button href="#" class="btn-start btn-syle" >Start</button>
+						</div>
+					</li>
+				</ul>
+			</li>
+			
+			<li><button id="dna-clb" href="#" class="tabsAn-a"><i class="material-icons">settings</i>Cleaning BAM</button>
+				<ul class="menu ul-first">
+					<li>
+						<div id="dna-clb-C" class="dna-progress-container-relative" >
+							<!-- progress-dna -->
+							<div class="dna-container-relative" >
+								<div id="dna-clb-D" class="dna-container">  
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+									<div class="dna-nucleotide"></div>
+								</div> 
+							</div> 
+							<!-- progress-bar -->
+							<div class="progress-container">
+								<div id="dna-clb-P" class="progress">
+									<b class="progress__bar">
+										<span class="progress__text">
+											Progress: <em>0%</em>
+										</span>
+									</b>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>Processing...</p>
+					</li>
+					<li>
+						<div class="clearfix">
+							<button href="#" class="btn-download btn-syle" disabled>Download</button>
+							<button href="#" class="btn-start btn-syle" >Start</button>
+						</div>
+					</li>
+				</ul>
+			</li>
+			
+			<li id="tabsAn-processing"><button id="dna-pr" href="#" class="tabsAn-a"><i class="material-icons">add</i>Variant Detection</button>
+				<ul class="menu ul-second" >
+				
+					<li><button id="dna-pr-variant" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>Variant Call </button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-pr-variant-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-pr-variant-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-pr-variant-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+					<li><button id="dna-pr-snp" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>SNP Call</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-pr-snp-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-pr-snp-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-pr-snp-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+					<li><button id="dna-pr-indel" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>Indels Call</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-pr-indel-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-pr-indel-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-pr-indel-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+					<li><button id="dna-pr-cnv" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>CNV Call</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-pr-cnv-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-pr-cnv-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-pr-cnv-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+
+					<li><button id="dna-pr-sv" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>SV Call</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-pr-sv-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-pr-sv-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-pr-sv-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+				</ul>
+			</li>
+			
+			<li id="tabsAn-ann"><button id="dna-ann" href="#" class="tabsAn-a"><i class="material-icons">add</i>Annotation</button>
+				<ul class="menu ul-second" >
+					<li><button id="dna-ann-snp" href="#tabsAn-ann" class="tabsAn-a-second"><i class="material-icons">settings</i>SNP Annotation</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-ann-snp-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-ann-snp-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-ann-snp-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+					<li><button id="dna-ann-indel" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>Indel Annotation</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-ann-indel-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-ann-indel-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-ann-indel-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+					<li><button id="dna-ann-del" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>Deletions Annotation</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-ann-del-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-ann-del-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-ann-del-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+					
+					<li><button id="dna-ann-ins" href="#tabsAn-processing" class="tabsAn-a-second"><i class="material-icons">settings</i>Insertions Annotation</button>
+						<ul class="menu-second ul-first">
+							<li>
+								<div id="dna-ann-ins-C" class="dna-progress-container-relative" >
+									<!-- progress-dna -->
+									<div class="dna-container-relative" >
+										<div id="dna-ann-ins-D" class="dna-container">  
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+											<div class="dna-nucleotide"></div>
+										</div> 
+									</div> 
+									<!-- progress-bar -->
+									<div class="progress-container">
+										<div id="dna-ann-ins-P" class="progress">
+											<b class="progress__bar">
+												<span class="progress__text">
+													Progress: <em>0%</em>
+												</span>
+											</b>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<p>Processing...</p>
+							</li>
+							<li>
+								<div class="clearfix">
+									<button href="#" class="btn-download btn-syle" disabled>Download</button>
+									<button href="#" class="btn-start btn-syle" >Start</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+
+			
+				</ul>
+			</li>
+		
+		
+		</ul>	
+		
+		</div>
+		<br>
+		<footer class="page-footer navv" style="bottom:0; left:0; right:0; position:absolute" id="footer">
+          <div class="container cnt">
+            <div class="row">
+              <div class="col l12 s12">
+                <ul class="pageLinks">
+			        <li class="tour col s12 l4 m4" href=""><i class="material-icons  ">play_circle_outline</i>Tour</li>
+			        <li class="support col s12 l4 m4" href=""><i class="material-icons  ">build</i>Support</a>
+			        <li class="col s12 l4 m4" href=""><i class="material-icons ">info_outline</i>About</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="footer-copyright">
+            <div class="container">
+            ©Copyright 2016 LeishSIC -Pasteur Tunis-
+            <a class="grey-text text-lighten-4 right" href="#!"><img style="margin-top:6px" src="/static/font/github.png"></a>
+            
+            </div>
+          </div>
+        </footer>
+  
+		
+		<script src="/static/js/libs/jquery.js"></script>
+		<!-- Compiled and minified JavaScript -->
+  		<script src="/static/js/libs/materialize.min.js"></script>
+     	<!-- Project JavaScript -->
+		<script type="text/javascript" src="/static/js/application/log.js"></script>
+		<script src="/static/js/application/index.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/sweetalert2/1.3.0/sweetalert2.min.js"></script>
+    
+  </body>
+</html>
