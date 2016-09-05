@@ -1,0 +1,11 @@
+#!/bin/bash
+# Script of step 3: Alignment
+# Goal: create dictionary for fileFasta
+# Tool: PICARD (CreateSequenceDictionary)
+
+fileFasta=$1
+fileResult=$2
+
+java -jar $PICARD CreateSequenceDictionary R="$fileFasta" O="$fileResult"
+
+exit 0

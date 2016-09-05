@@ -1,0 +1,16 @@
+#!/bin/bash
+# Script of step 5: Cleaning BAM - Mark Duplicates
+# Goal: clean the BAM produced - Mark Duplicates (PCR...) in fileBAM and produce fileResult (BAM) 
+# Tool: PICARD (MarkDuplicates)
+
+fileBam=$1
+fileResult=$2
+fileMetrics=$3
+fileCheck=$4
+
+(java -jar $PICARD MarkDuplicates \
+INPUT="$fileBam" \
+OUTPUT="$fileResult" \
+METRICS_FILE="$fileMetrics") 2> "$fileCheck"
+
+exit 0

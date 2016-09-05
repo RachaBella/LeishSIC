@@ -1,0 +1,17 @@
+#!/bin/bash
+# Script of step 3: Alignment
+# Goal: count the number of lines in fileFastq, (0: fileFastq not compressed)
+# Tool: wc (cmd linux)
+
+isGZ=$1
+fileFastq=$2
+
+if [ "$isGZ" -eq "0" ] ; then
+#echo "selma nnGZ"
+	wc -l "$fileFastq"
+else
+#echo "selma GZ"
+	zcat "$fileFastq" | wc -l
+fi
+
+exit 0

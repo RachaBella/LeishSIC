@@ -1,0 +1,14 @@
+#!/bin/bash
+# Script of step 5: Cleaning BAM - Realignment
+# Goal: clean the BAM produced - Realignment of fileBam taking into account indel targerts
+# Tool: GATK (IndelRealigner)
+
+fileFasta=$1
+fileBam=$2
+fileTarget=$3
+fileResult=$4
+fileCheck=$5
+
+(java -jar $GATK -T IndelRealigner -R "$fileFasta" -I "$fileBam" -targetIntervals "$fileTarget" -o "$fileResult") 2> "$fileCheck"
+
+exit 0

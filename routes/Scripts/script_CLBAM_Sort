@@ -1,0 +1,12 @@
+#!/bin/bash
+# Script of step 5: Cleaning BAM - Index BAM
+# Goal: clean the BAM produced - Sort and index fileBAM
+# Tool: PICARD (BuildBamIndex)
+
+fileBam=$1
+fileCheck=$2
+
+(java -jar $PICARD BuildBamIndex \
+INPUT="$fileBam") 2> "$fileCheck"
+
+exit 0

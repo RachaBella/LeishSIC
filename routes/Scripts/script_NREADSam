@@ -1,0 +1,9 @@
+#!/bin/bash
+# Script of step 4: Conversion
+# Goal: count the number of sequences in fileSam
+# Tool: wc (cmd linux)
+
+fileSam=$1
+cat "$fileSam" | grep -v '^ *@' | wc -l
+
+exit 0

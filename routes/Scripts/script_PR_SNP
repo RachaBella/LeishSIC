@@ -1,0 +1,13 @@
+#!/bin/bash
+# Script of step 6: Processing - SNP Call
+# Goal: process BAM file - filter snp in fileVcf in reference to fileFasta
+# Tool: GATK (SelectVariants)
+
+fileFasta=$1
+fileVcf=$2
+fileResult=$3
+fileCheck=$4
+
+(java -jar $GATK -T SelectVariants -R "$fileFasta" -V "$fileVcf" -selectType SNP -selectType mixed -o "$fileResult") 2> "$fileCheck"
+
+exit 0

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Script of step 4: Conversion
+# Goal: convert fileSam to fileResult in BAM format
+# Tool: PICARD (SortSam)
+
+fileSam=$1
+fileResult=$2
+fileCheck=$3
+
+(java -jar $PICARD SortSam \
+INPUT="$fileSam" \
+OUTPUT="$fileResult" \
+SORT_ORDER=coordinate) 2> "$fileCheck"
+ 
+exit 0

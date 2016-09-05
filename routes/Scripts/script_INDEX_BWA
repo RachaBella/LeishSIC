@@ -1,0 +1,10 @@
+#!/bin/bash
+# Script of step 3: Alignment
+# Goal: index fileFasta
+# Tool: BWA
+
+fileFasta=$1
+
+bwa index "$fileFasta"
+
+exit 0

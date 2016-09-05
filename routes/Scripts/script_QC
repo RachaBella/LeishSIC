@@ -1,0 +1,12 @@
+#!/bin/bash
+# Script of step 1: Quality Control
+# Goal: check quality of fileFastq, put result in fileResult
+# Tool: FastQC
+
+fileFastq=$1
+fileResult=$2
+fileCheck=$3
+
+(fastqc "$fileFastq" > "$fileResult") 2> "$fileCheck"
+
+exit 0

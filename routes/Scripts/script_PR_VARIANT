@@ -1,0 +1,13 @@
+#!/bin/bash
+# Script of step 6: Processing - Variant Call
+# Goal: process BAM file - call variants (principally snp and indel) in fileBam in reference to fileFasta
+# Tool: GATK (HaplotypeCaller)
+
+fileFasta=$1
+fileBam=$2
+fileResult=$3
+fileCheck=$4
+
+(java -jar $GATK -T HaplotypeCaller -R "$fileFasta" -I "$fileBam" -stand_call_conf 30 -stand_emit_conf 10 -o "$fileResult") 2> "$fileCheck"
+
+exit 0

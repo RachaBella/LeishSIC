@@ -1,0 +1,13 @@
+#!/bin/bash
+# Script of step 3: Alignment
+# Goal: align fileFastq to fileFasta, put result in fileResult
+# Tool: BWA
+
+fileFasta=$1
+fileFastq=$2
+fileResult=$3
+fileCheck=$4
+
+(bwa mem -M -R "@RG\tID:group1\tSM:sample1\tPL:illumina\tLB:lib1\tPU:unit1" "$fileFasta" "$fileFastq" > "$fileResult") 2> "$fileCheck"
+
+exit 0

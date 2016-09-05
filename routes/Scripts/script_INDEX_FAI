@@ -1,0 +1,10 @@
+#!/bin/bash
+# Script of step 3: Alignment
+# Goal: index fileFasta with faidx (.fai)
+# Tool: myFaidx
+
+fileFasta=$1
+
+myFaidx "$fileFasta"
+
+exit 0
