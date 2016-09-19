@@ -18,6 +18,7 @@ $(document).ready(function() {
 					$(".uploader2").css("display","block");
 			        $(".percent2").css("display","block");
 			        $(".MB").css("display","block");
+			        $(".goTo").css("display","none")
 			        FReader = new FileReader();
 			        Name = SelectedFile.name
 			        var Content = "<span id='NameArea'>Uploading " + SelectedFile.name + " as " + Name + "</span>";
@@ -47,7 +48,9 @@ $(document).ready(function() {
 					socket.on('Done', function (data){
 						 swal("Done!", "Uploaded with success", "success")
 						 $('.percentage2').text("100%")
+						 UpdateBar(100)
 						 $(".uploader2").hide();
+						 $(".goTo").css("display","block")
 						var Content = "<button	type='button' name='Upload' value='' id='Restart' class='Button'>Upload Another</button>";
 						// document.getElementById('UploadArea').innerHTML = Content;
 						// document.getElementById('Restart').addEventListener('click', location.reload(true));
@@ -74,6 +77,7 @@ $(document).ready(function() {
 
 	function UpdateBar(percent){
 	 $(".determinate2").css("width", percent + "%")
+	 $(".determinate2").css("background-color","#8b0000");
 	 $('.percentage2').text( (Math.round(percent*100)/100) +"%")
     // document.getElementById('ProgressBar').style.width = percent + '%';
     // document.getElementById('percent').innerHTML = (Math.round(percent*100)/100) + '%';
