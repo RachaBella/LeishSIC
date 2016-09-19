@@ -7,9 +7,9 @@ var l_major_chr_length = [268988, 355712, 384502, 472852, 465823, 516869, 596352
 var svgDiv='<div id="svgSnp" class="card-panel col s12 l9 m9" style="margin-top:50px"></div>'
 var checkBoxeIsolatCNV='<input type="checkbox" id="isolat" class="checkIs" checked=""/><label id="lab" for="isolat">Isolat</label>'
 var chartsDivSnp='<div class="modal myModal bigChartDivSNP"><div class="col s12" id="chartdivSNP" style=" height:500px"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents how many variations are in each chromosome, whatever the replaced base is. </span></div><div class="col s12" id="chartBasePercentSNP" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents how many A,C,G,T bases have been replaced in each chromosomes, and also shows the total number of each base replaced.</span></div><div class="col s12" id="chartBasePercentRepSNP" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents how many A,C,G or T bases replaced the normal bases, and also calculate the total number of each replacing base in the sample isolat.</span></div>'
-var qualityChart='<div class="col s12" style="height:200px"  id="chartQuality"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents how many variations are in each chromosome, whatever the replaced base is. </span></div>'
+var qualityChart='<div class="col s12" style="height:200px"  id="chartQuality"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents the quality of each variation. </span></div>'
 var matriceTable= '<div class="col s12" style="height:260px"><table class="highlight centered myTable" id="matriceBase"><thead><tr><th data-field=""> </th><th data-field="A">A</th><th data-field="T">T</th><th data-field="C">C</th><th data-field="G">G</th><th data-field="total">Total (of substitutes)</th></tr></thead><tbody><tr class="matA"><td>A</td><td class="00"></td><td class="01"></td><td class="02"></td><td class="03"></td><td class="04"></td></tr><tr class="matT"><td>T</td><td  class="10"></td><td class="11"></td><td class="12"></td><td class="13"></td><td class="14"></td></tr><tr class="matC"><td>C</td><td class="20"></td><td class="21"></td><td class="22"></td><td class="23"></td><td class="24"></td></tr><tr class="matG"><td>G</td><td class="30"></td><td class="31"></td><td class="32"></td><td class="33"></td><td class="34"></td></tr></tbody></table></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This is a matrice showing for each base the number of the substitutes from each other base, and a total of substitutes bases. </span></div>'
-var qualityChartChr='<div class="col s12" id="chartQualityChr" style=" height:500px"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents how many variations are in each chromosome, whatever the replaced base is. </span></div></div>'
+var qualityChartChr='<div class="col s12" id="chartQualityChr" style=" height:500px"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents the quality of the variation for each chromosome. </span></div></div>'
 var exportButtonSNP ='<div style="position: relative; height: 70px;"><div class="fixed-action-btn horizontal click-to-trigger" style="position: absolute; right: 24px;"><a class="btn-floating btn-large Menu"><i class="material-icons">menu</i></a><ul><li><a class="btn-floating red modal-trigger" id="callModalSNP" href="" style="transform: scaleY(1) scaleX(1) translateY(0px) translateX(0px); opacity: 1;"><i class="material-icons">insert_chart</i></a></li><li><a class="btn-floating yellow darken-1 exportButtonSNP" style="transform: scaleY(1) scaleX(1) translateY(0px) translateX(0px); opacity: 1;"><i class="material-icons">get_app</i></a></li></ul></div></div>'
 
 $(document).ready(function() {
@@ -589,96 +589,100 @@ function drawSNP(SNPfile, v) {
 						return SNPfile[i][3]
 					}	
 				} else {
+					//test if it contains a lot of base in each line of the table
 					for (var h=0; h< line.length; h++) {
-						if (line[h] ==="A") {
-							baseAReplacing++
-							matrice[0][0]=''
-							switch (SNPfile[i][2]) {
-								case "C": {
-									matrice[0][2]++
-									matrice[0][4]++
-								}
-								break;
-								case "G": {
-									matrice[0][3]++
-									matrice[0][4]++
-								}
-								break;
-								case "T": {
-								    matrice[0][1]++
-								    matrice[0][4]++
-								}
-								break;
+						for (var hh=0; hh < line[h].length; hh++) {
+							if (line[h][hh] ==="A") {
+								baseAReplacing++
+								matrice[0][0]=''
+								switch (SNPfile[i][2]) {
+									case "C": {
+										matrice[0][2]++
+										matrice[0][4]++
+									}
+									break;
+									case "G": {
+										matrice[0][3]++
+										matrice[0][4]++
+									}
+									break;
+									case "T": {
+									    matrice[0][1]++
+									    matrice[0][4]++
+									}
+									break;
 
-							}
-							
-						} else if (line[h] ==="T") {
-							baseTReplacing++
-							matrice[1][1]=''
-							switch (SNPfile[i][2]) {
-								case "C": {
-									matrice[1][2]++
-									matrice[1][4]++
 								}
-								break;
-								case "G": {
-									matrice[1][3]++
-									matrice[1][4]++
-								}
-								break;
-								case "A": {
-								    matrice[1][0]++
-								    matrice[1][4]++
-								}
-								break;
+								
+							} else if (line[h][hh] ==="T") {
+								baseTReplacing++
+								matrice[1][1]=''
+								switch (SNPfile[i][2]) {
+									case "C": {
+										matrice[1][2]++
+										matrice[1][4]++
+									}
+									break;
+									case "G": {
+										matrice[1][3]++
+										matrice[1][4]++
+									}
+									break;
+									case "A": {
+									    matrice[1][0]++
+									    matrice[1][4]++
+									}
+									break;
 
-							}
-							
-						} else if (line[h] ==="C") {
-							baseCReplacing++
-							matrice[2][2]=''
-							switch (SNPfile[i][2]) {
-								case "T": {
-									matrice[2][1]++
-									matrice[2][4]++
 								}
-								break;
-								case "G": {
-									matrice[2][3]++
-									matrice[2][4]++
-								}
-								break;
-								case "A": {
-								    matrice[2][0]++
-								    matrice[2][4]++
-								}
-								break;
+								
+							} else if (line[h][hh] ==="C") {
+								baseCReplacing++
+								matrice[2][2]=''
+								switch (SNPfile[i][2]) {
+									case "T": {
+										matrice[2][1]++
+										matrice[2][4]++
+									}
+									break;
+									case "G": {
+										matrice[2][3]++
+										matrice[2][4]++
+									}
+									break;
+									case "A": {
+									    matrice[2][0]++
+									    matrice[2][4]++
+									}
+									break;
 
-							}
-							
-						} else if (line[h] ==="G")  {
-							baseGReplacing++
-							matrice[3][3]=''
-							switch (SNPfile[i][2]) {
-								case "C": {
-									matrice[3][2]++
-									matrice[3][4]++
 								}
-								break;
-								case "T": {
-									matrice[3][1]++
-									matrice[3][4]++
-								}
-								break;
-								case "A":{
-								    matrice[3][0]++
-								    matrice[3][4]++
-								}
-								break;
+								
+							} else if (line[h][hh] ==="G")  {
+								baseGReplacing++
+								matrice[3][3]=''
+								switch (SNPfile[i][2]) {
+									case "C": {
+										matrice[3][2]++
+										matrice[3][4]++
+									}
+									break;
+									case "T": {
+										matrice[3][1]++
+										matrice[3][4]++
+									}
+									break;
+									case "A":{
+									    matrice[3][0]++
+									    matrice[3][4]++
+									}
+									break;
 
-							}
+								}
+								
+							}	
 							
-						}	
+						}
 
 					} return line
 				}
@@ -758,7 +762,7 @@ function drawSNP(SNPfile, v) {
 	        		$(".specialSnp").children().remove()
 	        	} 
 	        	 $(".specialSnp").append('<p class="col s3">'+ 'Quality: '+ d[4] + '<br>' + 'Descr: '+ d[5] + '</p>')
-		         return "Chromozome:"+ d[0] + '<br>' + "Position :"+ d[1] + '<br>' + "Quality :"+ d[4] + '<br>'+ "Ref :" + d[2] + "<br>" + "Alt: "+ d[3] + '<br>' 
+		         return "<h5>Chromozome:"+ d[0] + '</h5><br>' + "<h5>Position :"+ d[1] + '</h5><br>' + "<h5>Quality :"+ d[4] + '</h5><br>'+ "<h5>Ref :" + d[2] + "</h5><br>" + "<h5>Alt: "+ d[3] + '</h5><br>' 
 		          + '</span>'; 	
 	        }
         }
