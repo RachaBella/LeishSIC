@@ -1,7 +1,5 @@
 var mongoose = require("mongoose"),
 	Schema = mongoose.Schema,
-	crate = require('mongoose-crate'),
-	LocalFS = require('mongoose-crate-localfs'),
 	path = require('path'),
 	user = require("./users.js");
 
