@@ -31,6 +31,7 @@ function pageUpload() {
 		event.preventDefault();
 		$('.details').remove();
 		$(".determinate").css("width", 0+ "%");
+		$(".goTo").css("display","none")
 		$('.percentage').text(0 +"%")
 		console.log(divNumber)
 		if (document.getElementById('fileToUpload0').files.length ===0) {
@@ -64,12 +65,13 @@ function pageUpload() {
 			var name = ($("#uName").text()).replace("account_circle","")
 			name=name.replace(" ","")
 			$(this).ajaxSubmit({
-				url: "/users/"+name+ "/upload/files" ,
+				url: "/"+name+ "/upload/files" ,
 				beforeSubmit: function() {
 					
                 },
                 uploadProgress: function (event, position, total, percentComplete) {
-                	$(".determinate").css("width", percentComplete+ "%")
+                	$(".determinate1").css("width", percentComplete+ "%")
+                	$('.determinate1').css("background-color", "#8b0000")
                 	$('.percentage').text(percentComplete +"%")
                 	//$(".filesDetails").append('<p id="progress-status">' + percentComplete +' %</p>')
                 },
@@ -77,6 +79,7 @@ function pageUpload() {
                 	if (response.message ==="Success") {
                 		$(".uploader").hide();
                 		 swal("Done!", "Uploaded with success", "success")
+                		 $(".goTo").css("display","block")
                 	}
                 },
                 error: function(xhr) {
