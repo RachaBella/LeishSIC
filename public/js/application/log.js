@@ -32,7 +32,7 @@ $(document).ready(function() {
 	$('.modal-trigger').leanModal({
       dismissible: true, // Modal can be dismissed by clicking outside of the modal
       opacity: .5, // Opacity of modal background
-      in_duration: 300, // Transition in duration
+      in_duration: 400, // Transition in duration
       out_duration: 200, // Transition out duration
     });
 	var user = checkSession(); 
@@ -61,7 +61,7 @@ function pageLog() {
         }, 800);
 	})
 
-	$('#logIn').attr("class", "modal-action modal-close waves-effect waves-green btn-flat")
+	$('#logIn').attr("class", "waves-effect waves-green btn-flat")
 	$("#loginForm").on("submit", function (event) {
 	event.preventDefault();
 	console.log("login clicked")
@@ -69,18 +69,17 @@ function pageLog() {
 	var data = $(this).serialize();
 		$.post('/login', data, function (response){
 			console.log("the response login is = ", response)
-				if (response === "wrong email") {
-					$('#login').css("display", "block")
-					$('#login').openModal();
-					$(".error").append("<p class='errorMsgEmail'>This email doen't exist, try again</p>")
-				} else if (response ==="wrong password") {
-					$('#login').css("display","block")
-					$('#login').openModal();
-					$(".error").append("<p class='errorMsgEmail'>The password doesn't match, try again</p>")
-				} else {
-					changeName(response.user.userName)
-					user = response.user;
-				} 
+			if (response.message === "wrong email") {
+				$(".error").append("<p class='errorMsgEmail'>This email doen't exist, try again</p>")
+			} else if (response.message ==="wrong password") {
+				// $('#login').css("display","block")
+				
+				$(".error").append("<p class='errorMsgEmail'>The password doesn't match, try again</p>")
+			} else {
+				$('#login').closeModal();
+				changeName(response.user.userName)
+				user = response.user;
+			} 
 		});
 	})
 	
@@ -93,14 +92,14 @@ function pageLog() {
 		if (val === 1) {
 		 	$.post('/signup', data, function (response){
 				if (response ==="error") {
-					sweetAlert("Error", "An error occured, please try again", "error");
+					$(".error2").append("<p class='errorMsgEmail'>An error occured, please try again</p>")
 				} else if (response ==="email exists") {
-					sweetAlert("Error", "This email already exists, choose another one", "error");
-				} else if (response === "login exist") {
-					sweetAlert("Error", "This username is already taken, choose another one", "error");
+					$(".error2").append("<p class='errorMsgEmail'>This email already exists, choose another one and try again</p>")
+				} else if (response === "login exists") {
+					$(".error2").append("<p class='errorMsgEmail'>This username is already taken, choose another one and try again</p>")
 				} else {
-					changeName(response.userName);
-					user = response.user;
+					$('#signup').closeModal();
+					sweetAlert("Email Check","Check your email or your spam folder for a verification., ","success")
 				}
 			});
 		}  else if (val === 0) {
@@ -108,12 +107,7 @@ function pageLog() {
 		} else {
 			sweetAlert("Error", "The second password doesn't match, signup again!", "error");
 		}
-
-		console.log("the data is : ", data)
-		
-
 	})
-
 	//when the user click on logout
 	$(document).on("click",".Ulog", function (event) {
 		event.preventDefault();
@@ -135,6 +129,20 @@ function pageLog() {
 			console.log("the response is ", response.user)
 		})
 
+	})
+
+	$(document).on("click","#gotoVi", function (event) {
+		var name =$("#uName").text().replace("account_circle", "")
+		name= name.replace(" ","")
+		console.log(name)
+		window.location.href="/"+name+"/visualize"
+	})
+
+	$(document).on("click","#gotoAn", function (event) {
+		var name =$("#uName").text().replace("account_circle", "")
+		name= name.replace(" ","")
+		console.log(name)
+		window.location.href="/"+name+"/analyze"
 	})
 
 	$('#start').on("click", function (event) {
