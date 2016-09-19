@@ -100,6 +100,10 @@ p {
 .INDEL {
   background-color: whitesmoke
 }
+
+.details {
+  background-color: #2f4f4f;
+}
 .btn:hover {
   background-color: #8B0000
 }
@@ -246,6 +250,11 @@ span.wh {
   font-size:12px !important;
 }
 
+.bl2 {
+  color: black !important;
+  font-size:15px !important;
+}
+
 .smallButton {
   width: 25px !important;
   height: 25px !important;
@@ -366,6 +375,10 @@ a#starta {
   background-color: #f1e7da !important
 }
 
+.myCol2{
+  background-color: whitesmoke !important
+}
+
 .myTable {
   background-color: whitesmoke;
 }
@@ -462,6 +475,16 @@ a.brand-logo {
 .color {
     color: #FF7F50 !important;
 
+}
+
+.color1 {
+  background-color: #FF7F50 !important; 
+  color: #FF7F50 !important;
+
+}
+.color2 {
+  background-color: #5F9EA0; 
+  color: #5F9EA0
 }
 
 .valid {
