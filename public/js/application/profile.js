@@ -1,7 +1,7 @@
 console.log("sanity check profile");
 var regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$/
 var fileCard='<div class="card myCardFile"><div class="card-content"><span class="card-title mS activator grey-text text-darken-4 myCardTitle">File name<i class="material-icons right">more_vert</i></span></div><div class="card-reveal"><span class="card-title mS grey-text text-darken-4 secondTitle">File<i class="material-icons right">close</i></span><p class="type"><bold class="bold">Type : </bold></p><p class="path"><bold class="bold">Path : </bold></p><p class="size"><bold class="bold">Size : </bold></p><p class="uploadDate"><bold class="bold">Upload Date : </bold></p></div></div>'
-var divFileDetails2='<div class="details filesDetails row col s12 l12 m12 offset-s2" style=""> <ul class="collection"><li class="collection-item avatar myCol"><i class="material-icons circle">folder</i><span class="title actionType"> </span><p class="actionStep"> <br></p> <p class="actionDate"></p><br> <p class="actionDateEnd"></p><br> <p class="actionState"></p></li></ul>'
+var divFileDetails2='<div class="details filesDetails row col s12 l12 m12 offset-m2" style="margin-bottom: -13px"> <ul class="collection"><li class="collection-item avatar myCol2"><i class="material-icons circle">folder</i><span class="title actionType"> </span><p class="actionStep"> <br></p> <p class="actionDate"></p><br> <p class="actionDateEnd"></p><br> <p class="actionState"></p></li></ul>'
 
 
 $(document).ready(function() {
@@ -73,7 +73,7 @@ function checkUserInfo() {
 		$("#email").val(''+response.user.email);
 	})
 
-	$.get('/current_user/info', function (response) {
+	$.get('/current_user/Historique', function (response) {
 		if (response.message === "Error") {
 			console.log("error")
 			
@@ -219,13 +219,13 @@ function checkUserInfo() {
 function histo(div, response, i, stepName) {
 	$("#"+div).append(divFileDetails2)
 	$(".fileDetails").attr("class","details row col s12 l8 m8 offset-s2 filesDetails"+i);
-	$(".actionType").html("<b>Name: </b>" + response.actionType);
+	$(".actionType").html("<b>Name: </b>"  + "<span class='bl2'>"+ response.actionType+ "</span>");
 	$(".actionType").attr("class", 'title actionType'+i);
-	$(".actionStep").html('<b>Step: </b>' + stepName);
+	$(".actionStep").html('<b>Step: </b>' + "<span class='bl2'>"+  stepName +'</span>');
 	$(".actionStep").attr('class',"actionStep" + i);
-	$(".actionDate").html( response.actionDate);
+	$(".actionDate").html( "<span class='bl2'>"+ response.actionDate+ "</span>");
 	$(".actionDate").attr("class", "actionDate"+i);
-	$(".actionDateEnd").html( "<b>Ended on:" +response.actionDateEnd);
+	$(".actionDateEnd").html( "<b>Ended on:" + "<span class='bl2'>"+ response.actionDateEnd +"</span>");
 	$(".actionDateEnd").attr("class", "actionDateEnd"+i);
 	$(".actionState").html("<b>"+ response.actionState +"</b>")
 }
