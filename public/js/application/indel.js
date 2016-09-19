@@ -6,7 +6,7 @@ var l_major_chr_length = [268988, 355712, 384502, 472852, 465823, 516869, 596352
 var svgDivINDEL='<div id="svgIndel" class="card-panel col s12 l9 m9" style="margin-top:50px"></div>'
 var checkBoxeIsolatINDEL='<input type="checkbox" id="isolat" class="checkIs" checked=""/><label id="lab" for="isolat">Isolat</label>'
 var exportButtonINDEL ='<div style="position: relative; height: 70px;"><div class="fixed-action-btn horizontal click-to-trigger" style="position: absolute; right: 24px;"><a class="btn-floating btn-large Menu"><i class="material-icons">menu</i></a><ul><li><a class="btn-floating red modal-trigger" id="callModalINDEL" href="" style="transform: scaleY(1) scaleX(1) translateY(0px) translateX(0px); opacity: 1;"><i class="material-icons">insert_chart</i></a></li><li><a class="btn-floating yellow darken-1 exportButtonINDEL" style="transform: scaleY(1) scaleX(1) translateY(0px) translateX(0px); opacity: 1;"><i class="material-icons">get_app</i></a></li></ul></div></div>'
-var chartsDivIndel='<div class="modal myModal bigChartDivINDEL"><div class="col s12" id="chartdivINDEL" style=" height:500px"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents how many variations are in each chromosome, whatever the replaced base is. </span></div><div class="col s12" id="chartBasePercentINDEL" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents how many A,C,G,T bases have been replaced in each chromosomes, and also shows the total number of each base replaced.</span></div><div class="col s12" id="chartBasePercentRepINDEL" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents how many A,C,G or T bases replaced the normal bases, and also calculate the total number of each replacing base in the sample isolat.</span></div>'
+var chartsDivIndel='<div class="modal myModal bigChartDivINDEL"><div class="col s12" id="chartdivINDEL" style=" height:500px"></div><div class="card-panel myCard center" ><span class="white-text" style="font-size:12px"> This chart represents the total number of insertions and deletions in the chosen file </span></div><div class="col s12" id="chartnbrChrINDEL" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents the number of insertions and deletions for each chromosome.</span></div><div class="col s12" id="chartBasePercentRepINDEL" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents how many A,C,G or T bases replaced the normal bases, and also calculate the total number of each replacing base in the sample isolat.</span></div><div class="col s12" id="chartBasePercentRepINDEL" style=" height:500px"></div><div class="card-panel myCard2 center" ><span class="white-text" style="font-size:12px"> This chart represents how many A,C,G or T bases replaced the normal bases, and also calculate the total number of each replacing base in the sample isolat.</span></div></div>'
 
 
 $(document).ready(function() {
@@ -40,14 +40,14 @@ function pageLoadIndel() {
 						console.log(response[k][0])
 						console.log("length = ", response[k][0][2].length)
 						debugger
+						appendChartDivINDEL(k)
 						drawINDEL(response[k],k)
 						$(".checkBoxIndel").append(checkBoxeIsolatINDEL)
 						$('#isolat').attr('id', "isolatINDEL"+k);
 						$("#lab").attr('id', "lab"+k);
 						$("#lab"+k).text("Isolat "+ (k+1));
 						$("#lab"+k).attr("for", "isolatINDEL"+k)
-						appendChartDivINDEL(k)
-						implementChartINDEL(response[k],k)
+						// implementChartINDEL(response[k],k)
 					}
 					$(".echelleINDEL").css("display", "block")
 				    $(".echelleINDEL").pushpin( {
@@ -127,10 +127,10 @@ function CountChrNumberINDEL(file, indice) {
 function appendChartDivINDEL(i) {
 	$(".chartsINDEL").append(chartsDivIndel) //+"" +matriceTable +"" +qualityChart +""+ qualityChartChr);
 	$(".bigChartDivINDEL").attr("class", "modal bigChartINDEL"+i);
-	$('.bigChartIndel'+i).attr('id', "bigChartDivINDEL"+i);
+	$('.bigChartINDEL'+i).attr('id', "bigChartDivINDEL"+i);
 	$('#chartdivINDEL').attr("id","chartdivINDEL"+""+i);
 	//i should put the charts button to have an href the charts
-	$("#chartBasePercentINDEL").attr('id',"chartBasePercentINDEL" +""+i);
+	$("#chartnbrChrINDEL").attr('id',"chartnbrChrINDEL" +""+i);
 	$("#chartBasePercentRepINDEL").attr('id',"chartBasePercentRepINDEL" +""+i);
 	// $("#chartQuality").attr("id", "chartQuality"+""+i);
 	// $('#matriceBase').attr("id", "matriceBase"+""+i);
@@ -159,7 +159,23 @@ function appendSvgDivINDEL(containerType, type, v,className) {
 
 }
 
-//drawing the snps
+	//****************************GLOBAL VARIABLES FOR CHARTS************************//
+   	var insertion=0,
+   		deletion=0,
+   		numberInsChr=0,
+   		numberDelChr=0;
+   	var varChr= [];
+   	var qualityChartChr=[];
+   	var multipleInsertChr=[];
+   	var modifierCpt=0;
+   	var highCpt=0;
+   	var lowCpt=0;
+   	var nothingCpt=0;
+   	var moderateCpt=0;
+   	var lowQualCpt=0;
+   	var multipleInsertions=0;
+   	//******************************************************************************//
+//drawing the indels
 function drawINDEL(INDELfile, v) {
 	var chr = CountChrNumber(INDELfile, 0);
 	appendSvgDivINDEL("contindel", "svgIndel", v, "svggIndel");
@@ -178,7 +194,7 @@ function drawINDEL(INDELfile, v) {
 	var svg = d3.select("div#svgIndel"+v)
             .append("svg")
             .attr("id", "svgINDEL"+v)
-            .attr("width", 4000)
+            .attr("width", 5000)
             .attr("height", chr.length* 100 +100)
 
     var ch = [];
@@ -286,17 +302,19 @@ function drawINDEL(INDELfile, v) {
    			.data(INDELfile[1])
    			.attr("x", xBefore)
    			.attr("y", 1.5 *100)
-   			.attr("id","gRef"+chr[y1-1])
-
-
-   			
-   	
+   			.attr("id","gRef"+chr[y1-1])	
 
    	var X=60;
    	var check = 0;
    	for (var k =0; k< lon; k++) {
+   		if (INDELfile[k][3].length< INDELfile[k][2].length) {
+   			deletion = deletion +1
+   		} else {
+   			insertion =insertion+1
+   		}
 		var alternative=[]; 
 		if (INDELfile[k][3].match(/,/g) !== null) {
+			multipleInsertions++;
 			alternative = INDELfile[k][3].split(',');
 			var hell = INDELfile[k][3]
 			check=1;
@@ -320,6 +338,17 @@ function drawINDEL(INDELfile, v) {
    			y2++;
    			X=60;
    			xBefore=60;
+   			multipleInsertChr.push({
+   				chromosome: chr[y1-1],
+   				multiple: multipleInsertions
+   			})
+   			varChr.push({ chromosome: chr[y1-1],
+   						  insertion: numberInsChr,
+   						  deletion: numberDelChr
+   						});
+   			multipleInsertions =0;
+   			numberInsChr=0;
+   			numberDelChr=0;
    			before = current
    		 	var g= svg.append("g")
 		   			.data([1])
@@ -365,6 +394,18 @@ function drawINDEL(INDELfile, v) {
    						.attr("x", xBefore)
 		   				.attr("y", y1 *100)
 			   			.attr("fill", function (d,i) {
+			   				var value = INDELfile[k][5]
+							if (value.match(/LOW/) !== null) {
+								lowCpt++; 
+							} else if (value.match(/MODERATE/) !== null) {
+								moderateCpt++
+							} else if (value.match(/HIGH/) !== null) {
+								highCpt++
+							} else if (value.match(/MODIFIER/) !== null) {
+								modifierCpt++;
+							}else {
+								nothingCpt++
+							}
 			   				if (leAlt > leRef) {
 			   					return "#FF7F50"
 			   				} else {
@@ -375,15 +416,16 @@ function drawINDEL(INDELfile, v) {
 			   			.attr("width", function (d,i) {
 			   				if (leAlt < leRef) {
 			   					//we take then the leRef
+			   					numberDelChr++
 			   					xBefore += (2*leRef)+1
 			   					return 2*leRef+ 1
 			   				} else {
 			   					//we take then the leAlt
+			   					numberInsChr++
 			   					xBefore+= (2*leAlt)+1
 			   					return 2*leAlt+ 1
 			   				}
 			   			})
-			
    		} else {
    			before =current
 
@@ -418,6 +460,24 @@ function drawINDEL(INDELfile, v) {
    						.attr("x", xBefore)
 		   				.attr("y", y1 *100)
 			   			.attr("fill", function (d,i) {
+			   				var value = INDELfile[k][5]
+							if (value.match(/LOW/) !== null) {
+								lowCpt++; 
+							} else if (value.match(/MODERATE/) !== null) {
+								moderateCpt++
+							} else if (value.match(/HIGH/) !== null) {
+								highCpt++
+							} else if (value.match(/MODIFIER/) !== null) {
+								modifierCpt++;
+							}else {
+								nothingCpt++
+							}
+							//*****************//
+			   				if (leAlt > leRef) {
+			   					return "#FF7F50"
+			   				} else {
+			   					return "#5F9EA0"
+			   				}
 			   				if (leAlt > leRef) {
 			   					return "#FF7F50"
 			   				} else {
@@ -428,10 +488,12 @@ function drawINDEL(INDELfile, v) {
 			   			.attr("width", function (d,i) {
 			   				if (leAlt < leRef) {
 			   					//we take then the leRef
+			   					numberDelChr++
 			   					xBefore+= (2*leRef)+1
 			   					return (2*leRef)+ 1
 			   				} else {
 			   					//we take then the leAlt
+			   					numberInsChr++
 			   					xBefore+= (2*leAlt)+1
 			   					return (2*leAlt)+ 1
 			   				}
@@ -468,8 +530,6 @@ function drawINDEL(INDELfile, v) {
 					.attr("fill", "black")
 					.attr("width",1)
 					.attr("height", 20)
-				 console.log(alternative)
-				 debugger
 				$('svg rect#RECT'+chr[y1-1]+INDELfile[k][1]).tipsy({ 
 			        gravity: 's', 
 			        html: true, 
@@ -501,7 +561,6 @@ function drawINDEL(INDELfile, v) {
 				.attr("fill", "black")
 				.attr("width",1)
 				.attr("height", 20)
-
 			g2.append("text")
 					.data([1])
 					.attr('x', X+ (2*t) +0.3)
@@ -513,6 +572,16 @@ function drawINDEL(INDELfile, v) {
 		X= xBefore;
    		
    	}
+   	multipleInsertChr.push({
+   				chromosome: chr[y1-1],
+   				multiple: multipleInsertions
+   			})
+   	varChr.push({ 
+   				chromosome: chr[y1-1],
+	     		insertion: numberInsChr,
+   				deletion: numberDelChr
+   				});
+   	console.log(varChr)
  var zoom = svgPanZoom('#svgINDEL'+v, {
 		  panEnabled: true
 		, controlIconsEnabled: false
@@ -529,10 +598,163 @@ function drawINDEL(INDELfile, v) {
 		});
     zoom.zoom(1)
 
+    implementChartINDEL(insertion,deletion,v)
+    implementNumberINDEL(varChr, v) 
+    implementQualINDEL(lowCpt,highCpt,moderateCpt, modifierCpt, nothingCpt, v)
+    implementMultipleInser(multipleInsertions,v)
+    
 
 }
 
-function implementChartINDEL(IndelData, i) {
+function implementNumberINDEL(varChr, i) {
+	var chart = AmCharts.makeChart("chartnbrChrINDEL"+i, {
+    "type": "serial",
+    "theme": "light",
+    "legend": {
+        "useGraphSettings": true
+    },
+    "dataProvider":varChr,
+    "synchronizeGrid":true,
+    "valueAxes": [{
+        "id":"v1",
+        "axisColor": "#FF6600",
+        "axisThickness": 2,
+        "axisAlpha": 1,
+        "position": "left"
+    }, {
+        "id":"v2",
+        "axisColor": "#FCD202",
+        "axisThickness": 2,
+        "axisAlpha": 1,
+        "position": "right"
+    }],
+    "graphs": [{
+        "valueAxis": "v1",
+        "lineColor": "#FF6600",
+        "bullet": "round",
+        "bulletBorderThickness": 1,
+        "hideBulletsCount": 30,
+        "title": "Deletions",
+        "valueField": "deletion",
+		"fillAlphas": 0
+    }, {
+        "valueAxis": "v2",
+        "lineColor": "#FCD202",
+        "bullet": "triangleUp",
+        "bulletBorderThickness": 1,
+        "hideBulletsCount": 30,
+        "title": "Insertions",
+        "valueField": "insertion",
+		"fillAlphas": 0
+    }],
+    "chartScrollbar": {},
+    "chartCursor": {
+        "cursorPosition": "mouse"
+    },
+    "categoryField": "chromosome",
+    "categoryAxis": {
+        "axisColor": "#DADADA",
+        "minorGridEnabled": true
+    },
+    "export": {
+    	"enabled": true,
+        "position": "bottom-right"
+     }
+});
+}
+
+function implementChartINDEL(insertion, deletion, i) {
+	var chart = AmCharts.makeChart("chartdivINDEL"+i,
+	{
+	    "type": "serial",
+	    "theme": "light",
+	    "dataProvider": [{
+	        "name": "Insertions",
+	        "total": insertion,
+	        "color": "#7F8DA9"
+	    }, {
+	        "name": "Deletions",
+	        "total": deletion,
+	        "color": "#FEC514"
+	    }],
+	    "valueAxes": [{
+	        "maximum": 10000,
+	        "minimum": 0,
+	        "axisAlpha": 0,
+	        "dashLength": 4,
+	        "position": "left"
+	    }],
+	    "startDuration": 1,
+	    "graphs": [{
+	        "balloonText": "<span style='font-size:13px;'>[[category]]: <b>[[value]]</b></span>",
+	        "bulletOffset": 10,
+	        "bulletSize": 52,
+	        "colorField": "color",
+	        "cornerRadiusTop": 8,
+	        "fillAlphas": 0.8,
+	        "lineAlpha": 0,
+	        "legendValueText": "[[value]] substitution quality",
+        	"title": "Type of Variation",
+	        "type": "column",
+	        "valueField": "total"
+	    }],
+	    "categoryField": "name",
+	    "categoryAxis": {
+	        "axisAlpha": 0,
+	        "gridAlpha": 0,
+	        "inside": true,
+	        "tickLength": 0
+	    },
+	    "export": {
+	    	"enabled": true
+	     }
+	});
+}
+
+function implementQualINDEL(low,high,moderate,modifier,nothing, i) {
+
+}
+
+function implementMultipleInser(multipleInsertions, i) {
+	var chart = AmCharts.makeChart("chartdiv", {
+    "type": "serial",
+    "theme": "light",
+    "marginRight": 80,
+    "dataProvider": multipleInsertions,
+    "valueAxes": [{
+        "axisAlpha": 0.1
+    }],
+
+    "graphs": [{
+        "balloonText": "[[title]]: [[value]]",
+        "columnWidth": 20,
+        "fillAlphas": 1,
+        "title": "daily",
+        "type": "column",
+        "valueField": "value2"
+    }, {
+        "balloonText": "[[title]]: [[value]]",
+        "lineThickness": 2,
+        "title": "intra-day",
+        "valueField": "value1"
+    }],
+    "zoomOutButtonRollOverAlpha": 0.15,
+    "chartCursor": {
+        "categoryBalloonDateFormat": "MMM DD JJ:NN",
+        "cursorPosition": "mouse",
+        "showNextAvailable": true
+    },
+    "autoMarginOffset": 5,
+    "columnWidth": 1,
+    "categoryField": "date",
+    "categoryAxis": {
+        "minPeriod": "hh",
+        "parseDates": true
+    },
+    "export": {
+        "enabled": true
+    }
+});
 
 }
 
