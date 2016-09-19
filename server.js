@@ -5,8 +5,9 @@ var express = require("express"),
 	app = express(),
 	mongoose = require("mongoose"),
 	bodyParser = require("body-parser"),
+	nodemailer=require("nodemailer"),
 	moment= require("moment"),
-	// mime = require("mime"),
+	mime = require("mime"),
 	// rimraf = require("rimraf"),
  //    mkdirp = require("mkdirp"),
  //    multiparty = require('multiparty'),
@@ -61,7 +62,7 @@ var express = require("express"),
 	  }
 	})
 
-	var uploadD = multer({ storage: storage2 })
+	var uploadD = multer({ storage: storage })
 	var Upload  = require('./routes/gfs.js');
 	///////////////////////////////////////////////
 	//app.use(bodyParser({keepExtensions:true,uploadDir:path.join(__dirname,'/files')}));
@@ -165,7 +166,31 @@ function reinitFiles(callback){
 	var sessionUser = null;
 	var analysePipeline = require("./routes/analyse_pipeline");
 /////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+    Here we are configuring our SMTP Server details.
+    STMP is mail server which is responsible for sending and recieving email.
+*/
+
+require('dotenv').load();
+var email = process.env.Mail;
+var pass = process.env.pass;
+var smtpTransport = nodemailer.createTransport("SMTP",{
+    service: "Gmail",
+    auth: {
+        user: email,
+        pass: pass
+    }
+});
+var rand,mailOptions,host,link;
+/*------------------SMTP Over-----------------------------*/
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 /*Routes*/
+
+	app.get('/analyse', function (req, res) {
+		res.sendStatus(200);
+	})
+
 	app.get("/:userName/visualize", function (req, res) {
 		if (req.params.userName !== sessionUser.userName) {
 			res.render("ErrorForbidden")
@@ -300,10 +325,17 @@ function reinitFiles(callback){
 					message:"Error"
 				})
 			} else {
-				console.log("the actions are ", histos[0].actionDone)
-				return res.status(200).send({
-					message: histos[0].actionDone
-				})
+				console.log("the actions are ", histos.length)
+				if (histos.length ===0) {
+					return res.status(200).send({
+						message: null
+					})	
+				} else {
+					return res.status(200).send({
+						message: histos[0].actionDone
+					})
+				}
+				
 			}
 		})
 	})
@@ -314,7 +346,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		//result_QC=path.join(__dirname, result_QC);
-		analysePipeline.run_Step_QC(res,[script_QC,filesProcess[1],filesProcess[2],result_QC],result_QC, function (er){
+		analysePipeline.run_Step_QC(res,[script_QC,filesProcess[1],filesProcess[2],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_QC],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_QC, function (er){
 			if(er==1){
 				filesProcessExist[2]=1;
 				db.Action.findOneAndUpdate({_id:bigActionId[0]}, {$set:{actionDateEnd: moment().format('MMMM Do YYYY, h:mm:ss a'), actionState: "Success" }}, function (error, action) {
@@ -341,7 +373,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_ALN(res,[script_INDEX_BWA,filesProcess[0]],[filesProcess[3]],[script_DICT_FA,filesProcess[0],filesProcess[3]],[script_INDEX_FAI,filesProcess[0]], [script_ALN,filesProcess[0],filesProcess[1],filesProcess[4],result_ALN],result_ALN,[script_NREAD,isGZ,filesProcess[1]],function (er){
+		analysePipeline.run_Step_ALN(res,[script_INDEX_BWA,filesProcess[0]],[filesProcess[3]],[script_DICT_FA,filesProcess[0],filesProcess[3]],[script_INDEX_FAI,filesProcess[0]], [script_ALN,filesProcess[0],filesProcess[1],filesProcess[4],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ALN],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ALN,[script_NREAD,isGZ,filesProcess[1]],function (er){
 			if(er==1){
 				filesProcessExist[3]=1;
 				filesProcessExist[4]=1;
@@ -367,7 +399,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_CV(res,[script_CV,filesProcess[4],filesProcess[5],result_CV],result_CV,[script_NREADSam,filesProcess[4]],function(nbSeq,er){
+		analysePipeline.run_Step_CV(res,[script_CV,filesProcess[4],filesProcess[5],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CV],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CV,[script_NREADSam,filesProcess[4]],function(nbSeq,er){
 			nbSeqSAM=nbSeq;
 			console.log("nbSeqSAM : "+nbSeqSAM);
 			if(er==1){
@@ -394,10 +426,10 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_ClBAM(res,[script_CLBAM_MDup,filesProcess[5],filesProcess[6],fileMetrics,result_CLBAM_MDup],result_CLBAM_MDup,nbSeqSAM,
-		[script_CLBAM_Sort,filesProcess[6],result_CLBAM_Sort],result_CLBAM_Sort,
-		[script_CLBAM_Target,filesProcess[0],filesProcess[6],fileListTarget,result_CLBAM_Target],result_CLBAM_Target,
-		[script_CLBAM_Realign,filesProcess[0],filesProcess[6],fileListTarget,filesProcess[7],result_CLBAM_Realign],result_CLBAM_Realign, function (er){
+		analysePipeline.run_Step_ClBAM(res,[script_CLBAM_MDup,filesProcess[5],filesProcess[6],fileMetrics,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_MDup],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_MDup,nbSeqSAM,
+		[script_CLBAM_Sort,filesProcess[6],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort,
+		[script_CLBAM_Target,filesProcess[0],filesProcess[6],fileListTarget,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Target],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Target,
+		[script_CLBAM_Realign,filesProcess[0],filesProcess[6],fileListTarget,filesProcess[7],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Realign],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Realign, function (er){
 			if(er==1){
 				filesProcessExist[6]=1;
 				filesProcessExist[7]=1;
@@ -429,8 +461,8 @@ function reinitFiles(callback){
 			var fileBAM=filesProcess[7];
 		}
 		if(type=="DNA-Seq"){
-			analysePipeline.run_Step_PR_Variant(res,[script_CLBAM_Sort,fileBAM,result_CLBAM_Sort],result_CLBAM_Sort,
-			[script_PR_VARIANT,filesProcess[0],fileBAM,filesProcess[8],result_PR_VARIANT],result_PR_VARIANT, function (er){
+			analysePipeline.run_Step_PR_Variant(res,[script_CLBAM_Sort,fileBAM,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort,
+			[script_PR_VARIANT,filesProcess[0],fileBAM,filesProcess[8],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_VARIANT],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_VARIANT, function (er){
 				if(er==1){
 					filesProcessExist[8]=1;
 					db.Action.findOneAndUpdate({_id:bigActionId[5]}, {$set:{actionDateEnd: moment().format('MMMM Do YYYY, h:mm:ss a'), actionState: "Success" }}, function (error, action) {
@@ -444,8 +476,8 @@ function reinitFiles(callback){
 				}
 			});
 		} else{
-			analysePipeline.run_Step_PR_Variant(res,[script_CLBAM_Sort,fileBAM,result_CLBAM_Sort],result_CLBAM_Sort,
-			[script_RNA_VARIANT,filesProcess[0],fileBAM,filesProcess[8],result_PR_VARIANT],result_PR_VARIANT, function (er){
+			analysePipeline.run_Step_PR_Variant(res,[script_CLBAM_Sort,fileBAM,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort,
+			[script_RNA_VARIANT,filesProcess[0],fileBAM,filesProcess[8],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_VARIANT],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_VARIANT, function (er){
 				if(er==1){
 					filesProcessExist[8]=1;
 					db.Action.findOneAndUpdate({_id:bigActionId[5]}, {$set:{actionDateEnd: moment().format('MMMM Do YYYY, h:mm:ss a'), actionState: "Success" }}, function (error, action) {
@@ -473,7 +505,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_PR_SNP(res,[script_PR_SNP,filesProcess[0],filesProcess[8],filesProcess[9],result_PR_SNP],result_PR_SNP, function (er){
+		analysePipeline.run_Step_PR_SNP(res,[script_PR_SNP,filesProcess[0],filesProcess[8],filesProcess[9],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SNP],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SNP, function (er){
 			if(er==1){
 				filesProcessExist[9]=1;
 				db.Action.findOneAndUpdate({_id:bigActionId[6]}, {$set:{actionDateEnd: moment().format('MMMM Do YYYY, h:mm:ss a'), actionState: "Success" }}, function (error, action) {
@@ -501,7 +533,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_PR_Indel(res,[script_PR_INDEL,filesProcess[0],filesProcess[8],filesProcess[10],result_PR_INDEL],result_PR_INDEL,function (er){
+		analysePipeline.run_Step_PR_Indel(res,[script_PR_INDEL,filesProcess[0],filesProcess[8],filesProcess[10],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_INDEL],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_INDEL,function (er){
 			if(er==1){
 				filesProcessExist[10]=1;
 				db.Action.findOneAndUpdate({_id:bigActionId[7]}, {$set:{actionDateEnd: moment().format('MMMM Do YYYY, h:mm:ss a'), actionState: "Success" }}, function (error, action) {
@@ -537,12 +569,12 @@ function reinitFiles(callback){
 		}
 		stepRepeatTypes=filesProcessExist[12]+filesProcess[14]+filesProcess[14];
 		
-		run_Step_PR_SV(res,stepRepeatTypes,"CNV",[script_CLBAM_Sort,fileBAM,result_CLBAM_Sort],result_CLBAM_Sort,result_PR_SV,
-		[script_PR_SV_DEL,filesProcess[0],fileBAM,filesProcess[11],filesProcess[12],result_PR_SV],
-		[script_PR_SV_INS,filesProcess[0],fileBAM,filesProcess[11],filesProcess[13],result_PR_SV],
-		[script_PR_SV_DUP,filesProcess[0],fileBAM,filesProcess[11],filesProcess[14],result_PR_SV],
-		[script_PR_SV_INV,filesProcess[0],fileBAM,filesProcess[11],filesProcess[15],result_PR_SV],
-		[script_PR_SV_TRA,filesProcess[0],fileBAM,filesProcess[11],filesProcess[16],result_PR_SV],filesProcess[11],function(er,arret){
+		run_Step_PR_SV(res,stepRepeatTypes,"CNV",[script_CLBAM_Sort,fileBAM,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV,
+		[script_PR_SV_DEL,filesProcess[0],fileBAM,filesProcess[11],filesProcess[12],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_INS,filesProcess[0],fileBAM,filesProcess[11],filesProcess[13],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_DUP,filesProcess[0],fileBAM,filesProcess[11],filesProcess[14],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_INV,filesProcess[0],fileBAM,filesProcess[11],filesProcess[15],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_TRA,filesProcess[0],fileBAM,filesProcess[11],filesProcess[16],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],filesProcess[11],function(er,arret){
 			if(er==1){
 				filesProcessExist[12]=1;
 				filesProcessExist[14]=1;
@@ -588,12 +620,12 @@ function reinitFiles(callback){
 		}
 		stepRepeatTypes=filesProcessExist[12]+filesProcess[13]+filesProcess[14]+filesProcess[15]+filesProcess[16];
 		
-		run_Step_PR_SV(res,stepRepeatTypes,"SV",[script_CLBAM_Sort,fileBAM,result_CLBAM_Sort],result_CLBAM_Sort,result_PR_SV,
-		[script_PR_SV_DEL,filesProcess[0],fileBAM,filesProcess[11],filesProcess[12],result_PR_SV],
-		[script_PR_SV_INS,filesProcess[0],fileBAM,filesProcess[11],filesProcess[13],result_PR_SV],
-		[script_PR_SV_DUP,filesProcess[0],fileBAM,filesProcess[11],filesProcess[14],result_PR_SV],
-		[script_PR_SV_INV,filesProcess[0],fileBAM,filesProcess[11],filesProcess[15],result_PR_SV],
-		[script_PR_SV_TRA,filesProcess[0],fileBAM,filesProcess[11],filesProcess[16],result_PR_SV],filesProcess[11],function(er,arret){
+		run_Step_PR_SV(res,stepRepeatTypes,"SV",[script_CLBAM_Sort,fileBAM,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_CLBAM_Sort,__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV,
+		[script_PR_SV_DEL,filesProcess[0],fileBAM,filesProcess[11],filesProcess[12],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_INS,filesProcess[0],fileBAM,filesProcess[11],filesProcess[13],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_DUP,filesProcess[0],fileBAM,filesProcess[11],filesProcess[14],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_INV,filesProcess[0],fileBAM,filesProcess[11],filesProcess[15],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],
+		[script_PR_SV_TRA,filesProcess[0],fileBAM,filesProcess[11],filesProcess[16],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_PR_SV],filesProcess[11],function(er,arret){
 			if(er==1){
 				filesProcessExist[12]=1;
 				filesProcessExist[13]=1;
@@ -672,7 +704,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[9],filesProcess[20],fileDB,filesProcess[19],result_ANN],result_ANN,function (er){
+		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[9],filesProcess[20],fileDB,filesProcess[19],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN,function (er){
 			if(er==1){
 				filesProcessExist[19]=1;
 				filesProcessExist[20]=1;
@@ -704,7 +736,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[10],filesProcess[23],fileDB,filesProcess[22],result_ANN],result_ANN,function (er){
+		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[10],filesProcess[23],fileDB,filesProcess[22],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN,function (er){
 			if(er==1){
 				filesProcessExist[22]=1;
 				filesProcessExist[23]=1;
@@ -736,7 +768,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[12],filesProcess[26],fileDB,filesProcess[25],result_ANN],result_ANN,function (er){
+		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[12],filesProcess[26],fileDB,filesProcess[25],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN,function (er){
 			if(er==1){
 				filesProcessExist[25]=1;
 				filesProcessExist[26]=1;
@@ -769,7 +801,7 @@ function reinitFiles(callback){
 	    res.writeHead(200, {"Content-Type":"text/event-stream", "Cache-Control":"no-cache", "Connection":"keep-alive"});
 		res.write("retry: 10000\n");
 		
-		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[13],filesProcess[29],fileDB,filesProcess[28],result_ANN],result_ANN,function (er){
+		analysePipeline.run_Step_ANN(res,[script_ANN,filesProcess[13],filesProcess[29],fileDB,filesProcess[28],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN],__dirname+ '/uploads/'+ sessionUser.userName+'/'+result_ANN,function (er){
 			if(er==1){
 				filesProcessExist[28]=1;
 				filesProcessExist[29]=1;
@@ -795,7 +827,7 @@ function reinitFiles(callback){
 	});
 
 	app.get('/download_dna-qc', function(req, res) {
-		var file = __dirname +filesProcess[2];
+		var file = __dirname +'/'+filesProcess[2];
 		console.log("file "+file);
 		
 		var filename = path.basename(file);
@@ -812,7 +844,7 @@ function reinitFiles(callback){
 
 	app.get('/download_dna-al', function(req, res) {
 
-		var file = __dirname +filesProcess[4];
+		var file = __dirname +'/'+filesProcess[4];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -829,7 +861,7 @@ function reinitFiles(callback){
 
 	app.get('/download_dna-cv', function(req, res) {
 
-		var file = __dirname +filesProcess[5];
+		var file = __dirname +'/'+filesProcess[5];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -846,7 +878,7 @@ function reinitFiles(callback){
 	
 	app.get('/download_dna-clb', function(req, res) {
 
-		var file = __dirname +filesProcess[7];
+		var file = __dirname +'/'+filesProcess[7];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -863,7 +895,7 @@ function reinitFiles(callback){
 
 	app.get('/download_dna-pr-variant', function(req, res) {
 
-		var file = __dirname +filesProcess[8];
+		var file = __dirname +'/'+filesProcess[8];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -880,7 +912,7 @@ function reinitFiles(callback){
 	
 	app.get('/download_dna-pr-snp', function(req, res) {
 
-		var file = __dirname +filesProcess[9];
+		var file = __dirname +'/'+filesProcess[9];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -897,7 +929,7 @@ function reinitFiles(callback){
 
 	app.get('/download_dna-pr-indel', function(req, res) {
 
-		var file = __dirname +filesProcess[10];
+		var file = __dirname +'/'+filesProcess[10];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -914,7 +946,7 @@ function reinitFiles(callback){
 	
 	app.get('/download_dna-pr-cnv', function(req, res) {
 		analysePipeline.run_error("tar", ["-cvzf",filesProcess[12],filesProcess[14],filesProcess[17]],function(e,r){});
-		var file = __dirname +filesProcess[17];
+		var file = __dirname +'/'+filesProcess[17];
 		
 		console.log("file "+file);
   
@@ -932,7 +964,7 @@ function reinitFiles(callback){
 	
 	app.get('/download_dna-pr-sv', function(req, res) {
 		analysePipeline.run_error("tar", ["-cvzf",filesProcess[12],filesProcess[13],filesProcess[14],filesProcess[15],filesProcess[16],filesProcess[18]],function(e,r){});
-		var file = __dirname +filesProcess[18];
+		var file = __dirname +'/'+filesProcess[18];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -949,7 +981,7 @@ function reinitFiles(callback){
 
 	app.get('/download_dna-ann-snp', function(req, res) {
 
-		var file = __dirname +filesProcess[19];
+		var file = __dirname +'/'+filesProcess[19];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -966,7 +998,7 @@ function reinitFiles(callback){
 	
 	app.get('/download_dna-ann-indel', function(req, res) {
 
-		var file = __dirname +filesProcess[22];
+		var file = __dirname +'/'+filesProcess[22];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -983,7 +1015,7 @@ function reinitFiles(callback){
 
 	app.get('/download_dna-ann-del', function(req, res) {
 
-		var file = __dirname +filesProcess[25];
+		var file = __dirname +'/'+filesProcess[25];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -1000,7 +1032,7 @@ function reinitFiles(callback){
 	
 	app.get('/download_dna-ann-ins', function(req, res) {
 
-		var file = __dirname +filesProcess[28];
+		var file = __dirname +'/'+filesProcess[28];
 		console.log("file "+file);
   
 		var filename = path.basename(file);
@@ -1106,9 +1138,9 @@ function reinitFiles(callback){
 		Upload.readParseINDEL(req, res, sessionUser._id)
 
 	})
-
+	var newUser= {}
 	app.post("/signup", function (req, res) {
-		var newUser = {
+		newUser = {
 			firstName :req.body.firstname,
 			lastName : req.body.lastname,
 			userName : req.body.username,
@@ -1127,23 +1159,66 @@ function reinitFiles(callback){
 					} else if (result2 === "login exists") {
 						res.send("login exists")
 					} else {
-						db.User.createSecure(newUser.firstName, newUser.lastName, newUser.userName, newUser.password, newUser.email, function (error, newU) {
-							if (error) {
-								res.send("error")
-							} else {
-								console.log("the NEW USER IS : ", newU)
-								//req.session.user = newU;
-								sessionUser = newU;
-								userPath = userPath+ sessionUser.userName
-								//req.session._id= newU._id;
-								res.send(newU);
-							}
-						})
+						//we send to the user the fact that he has to verify his mail: 
+						rand=Math.floor(((Math.random() * 99999999999999) + 1));
+						host=req.get('host');
+					    link="http://"+req.get('host')+"/LeishSIC/verify?id="+rand;
+					    mailOptions={
+					        to : req.body.email,
+					        subject : "LeishSIC :Please confirm your Email account",
+					        html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+					    }
+					    smtpTransport.sendMail(mailOptions, function(error, response){
+						     if(error){
+						            console.log(error);
+						        res.status.send("error");
+						     }else{
+						            console.log("Message sent: " + response.message);
+						            res.status(200).send({
+										message: "SUCCESS"
+									});
+						        
+						     }
+						});
 					}
 				})
 			}
 		})
 	})
+
+	app.get('/LeishSIC/verify',function(req,res){
+		if((req.protocol+"://"+req.get('host'))==("http://"+host))
+		{
+		    console.log("Domain is matched. Information is from Authentic email");
+		    if(req.query.id==rand)
+		    {
+		        console.log("email is verified");
+	        //THIS PART WHEN WE VERIFY THE EMAIL
+				db.User.createSecure(newUser.firstName, newUser.lastName, newUser.userName, newUser.password, newUser.email, function (error, newU) {
+					if (error) {
+						res.send("error")
+					} else {
+						console.log("the NEW USER IS : ", newU)
+						//req.session.user = newU;
+						sessionUser = newU;
+						userPath = userPath+ sessionUser.userName
+						//req.session._id= newU._id;
+						res.render("pageAcceuil")
+					}
+				})
+		        
+		    }
+		    else
+		    {
+		        console.log("email is not verified");
+		        res.render("pageAcceuil")
+		    }
+		}
+		else
+		{
+		    res.render("pageAcceuil")
+		}
+	});
 
 	app.post("/login", function (req, res) {
 		var user = {
@@ -1153,10 +1228,10 @@ function reinitFiles(callback){
 		db.User.authenticate(user.email, user.pass, function (msg, response) {
 			if (msg === 'wrong email') {
 				console.log("wrong email")
-				res.send("wrong email")
+				res.send({message :"wrong email"})
 			}  else if (msg === "Error: incorrect password") {
 				console.log("wrong password")
-				res.send("wrong password")
+				res.send( {message: "wrong password"})
 			}else {
 				console.log("login response", response)
 				sessionUser = response;
@@ -1184,7 +1259,7 @@ function reinitFiles(callback){
 	})
 
 	//getting user historique
-	app.get("/current_user/info", function (req, res) {
+	app.get("/current_user/Historique", function (req, res) {
 
 		db.Historique.findOne({_user: sessionUser._id}).populate("fileInformation").exec(function (error, historique) {
 			if (error) {
@@ -1241,6 +1316,12 @@ function reinitFiles(callback){
 		if (sessionUser !== null) {
 			if (req.params.userName === sessionUser.userName) {
 				console.log("page envoyée")
+				reinitFiles( function(filesNames,filesExist,gz,nbSAM){
+					filesProcess=filesNames;
+					filesProcessExist=filesExist;
+					isGZ=gz;
+					nbSeqSAM = nbSAM;
+				})
 				res.render('upload');
 			} else {
 				res.render("ErrorForbidden")
@@ -1251,18 +1332,12 @@ function reinitFiles(callback){
 		}
 	})
 
-	app.post("/users/:userName/upload/files",uploadD.any(), function (req, res) {
+	var destDir;
+	app.post("/:userName/upload/files",uploadD.any(), function (req, res) {
 		console.log("Headers ARE:", req.headers)
 		console.log("FILES ARE:", req.files)
 		console.log("the other inputs : ", req.body)
 		var l = req.files.length;
-		reinitFiles( function(filesNames,filesExist,gz,nbSAM){
-			filesProcess=filesNames;
-			filesProcessExist=filesExist;
-			isGZ=gz;
-			nbSeqSAM = nbSAM;
-
-		})
 		if (sessionUser.userName !== req.params.userName) {
 			res.render("ErrorForbidden")
 		} else {
@@ -1276,7 +1351,7 @@ function reinitFiles(callback){
 				// 	filesProcessExist[1] = 1;
 				// } else {
 				if (type === "Fasta") {
-					filesProcess[0] = req.files[0].path;
+					filesProcess[0] =  req.files[0].path;
 					filesProcessExist[0] = 1;
 				}
 			} else {
@@ -1298,7 +1373,6 @@ function reinitFiles(callback){
 	//////////////////////////////////////////////////////////////
 				/*FASTQ FILE SOCKET TREATMENT*/
 	var Files = {};
-	var destDir;
 		io.sockets.on('connection', function (socket) {
 		    socket.on('Start', function (data) { //data contains the variables that we passed through in the html file
 			        var Name = data['Name'];
@@ -1552,8 +1626,8 @@ function reinitFiles(callback){
 
  	// }
 
- server.listen(process.env.PORT || 4000, function () {
-		console.log("listening on port 5000 ... success :)");
+ server.listen(process.env.PORT || 80, function () {
+		console.log("listening on port 80 ... success :)");
 		
 	});
 
