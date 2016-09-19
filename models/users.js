@@ -38,8 +38,10 @@ userSchema.statics.checklogin = function (userName, callback) {
 			callback("error");
 		} else {
 			if (found.length) {
+				console.log("login exist")
 				callback("login exists")
 			} else  {
+				console.log(found)
 				callback(null);	
 			} 
 		}
